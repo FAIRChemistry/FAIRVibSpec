@@ -2,17 +2,13 @@
 Module contains utility functions used in the IR analysis module
 """
 
-from types import NoneType
 import numpy as np
 import pandas as pd
-from numpy.typing import ArrayLike
-from scipy.stats import norm, cauchy
-from scipy.signal import find_peaks, peak_widths
-from scipy.optimize import curve_fit
 from astropy import units as u
-
-from datamodel.core import fit
-from datamodel.core.value import Value
+from numpy.typing import ArrayLike
+from scipy.optimize import curve_fit
+from scipy.signal import find_peaks, peak_widths
+from scipy.stats import cauchy, norm
 
 
 def _dataframe_truncate(dataframe: pd.DataFrame, wavenumber_region) -> pd.DataFrame:
@@ -54,9 +50,9 @@ def _single_gauss(
     return norm.pdf(wavenumber, loc=mean, scale=std_dev) * area
 
 
-def _find_bands(spectrum_df: pd.DataFrame, 
-                prominence:float = 0.01,
-                rel_height:float = 0.96) -> pd.DataFrame:
+def _find_bands(
+    spectrum_df: pd.DataFrame, prominence: float = 0.01, rel_height: float = 0.96
+) -> pd.DataFrame:
     """Function to find peak centers and the region where the peak starts
     and ends.
 
@@ -112,10 +108,8 @@ def _gauss_lorentz_curve(
 
 
 def _fit_curve(
-    data_df: pd.DataFrame,
-    fit_model,
-    fit_parameter_bounds,
-    fit_parameter_guesses) -> tuple[np.ndarray, np.ndarray]:
+    data_df: pd.DataFrame, fit_model, fit_parameter_bounds, fit_parameter_guesses
+) -> tuple[np.ndarray, np.ndarray]:
     """Fits data with a gauss-lorentz curve and returns the found parameters
 
     Args:
@@ -136,7 +130,7 @@ def _fit_curve(
     return popt_gl, pcov_gl
 
 
-def _get_quantity_object(value_object: Value, error=False, **kwargs) -> u.Quantity:
+def _get_quantity_object(value_object: "Value", error=False, **kwargs) -> u.Quantity:
     """Creates an Astropy Quantity object from the value and unit of a
     value_object from the data model. Unit can be explicitly specified
 
@@ -156,7 +150,7 @@ def _get_quantity_object(value_object: Value, error=False, **kwargs) -> u.Quanti
     return quantity_object
 
 
-def _auto_assign_band(peak_location: Value, expected_peaks: pd.DataFrame) -> str:
+def _auto_assign_band(peak_location: "Value", expected_peaks: pd.DataFrame) -> str:
     """Takes a band object from the data model, determines the smallest
     difference in peak location and returns the corresponding dict key.
 
@@ -173,12 +167,11 @@ def _auto_assign_band(peak_location: Value, expected_peaks: pd.DataFrame) -> str
             for exp_loc in expected_peaks["location"]
         ]
     )
-    closest_to_expected = list(expected_peaks.index)[
-        difference_to_expected.argmin()
-    ]
+    closest_to_expected = list(expected_peaks.index)[difference_to_expected.argmin()]
     return closest_to_expected
 
-def _value_to_string(value: Value) -> str:
+
+def _value_to_string(value: "Value") -> str:
     """Converts a value object to a string representation
 
     Args:
@@ -189,8 +182,8 @@ def _value_to_string(value: Value) -> str:
     """
     if value.error:
         # determine number of significant decimals
-        significant_decimals = int(np.ceil(- np.log10(value.error)))
-        #rounding
+        significant_decimals = int(np.ceil(-np.log10(value.error)))
+        # rounding
         significant_value = round(value.value, significant_decimals)
         significant_error = round(value.error, significant_decimals)
         return f"${significant_value} \pm {significant_error}$"

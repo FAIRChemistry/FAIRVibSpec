@@ -86,6 +86,9 @@ This object keeps track of important synthesis and measurement parameters.
 
 Contains one measurement done for the experiment. E.g. sample, unloaded sample and background.
 
+- __id__
+  - Type: Identifier
+  - Description: Unique identifier for the single measurement.
 - __name__
   - Type: string
   - Description: Descriptive name for the single measurement.
