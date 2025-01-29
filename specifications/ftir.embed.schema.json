@@ -1,0 +1,2520 @@
+{
+  "$id" : "http://purl.allotrope.org/json-schemas/adm/ftir/REC/2021/12/ftir.embed.schema",
+  "$schema" : "https://json-schema.org/draft/2020-12/schema",
+  "required" : [ "beamsplitter type", "equipment serial number", "measurement identifier", "measurement time", "sample identifier", "detector type", "analyst" ],
+  "properties" : {
+    "beamsplitter type" : {
+      "$asm.property-class" : "http://purl.allotrope.org/ontologies/result#AFR_0002254",
+      "$asm.pattern" : "value datum",
+      "$asm.type" : "http://www.w3.org/2001/XMLSchema#string",
+      "oneOf" : [ {
+        "type" : "string"
+      }, {
+        "type" : "object",
+        "required" : [ "@type", "value" ],
+        "properties" : {
+          "value" : {
+            "type" : "string"
+          },
+          "@type" : {
+            "type" : "string",
+            "$asm.type" : "http://www.w3.org/2000/01/rdf-schema#Class",
+            "$asm.lookup-property" : "http://www.w3.org/2004/02/skos/core#prefLabel"
+          }
+        }
+      } ]
+    },
+    "michelson interferometer acquisition mode setting" : {
+      "$asm.property-class" : "http://purl.allotrope.org/ontologies/result#AFR_0002390",
+      "$asm.pattern" : "value datum",
+      "$asm.type" : "http://www.w3.org/2001/XMLSchema#string",
+      "oneOf" : [ {
+        "type" : "string"
+      }, {
+        "type" : "object",
+        "required" : [ "@type", "value" ],
+        "properties" : {
+          "value" : {
+            "type" : "string"
+          },
+          "@type" : {
+            "type" : "string",
+            "$asm.type" : "http://www.w3.org/2000/01/rdf-schema#Class",
+            "$asm.lookup-property" : "http://www.w3.org/2004/02/skos/core#prefLabel"
+          }
+        }
+      } ]
+    },
+    "reference identifier" : {
+      "$asm.property-class" : "http://purl.allotrope.org/ontologies/result#AFR_0001992",
+      "$asm.pattern" : "value datum",
+      "$asm.type" : "http://www.w3.org/2001/XMLSchema#string",
+      "oneOf" : [ {
+        "type" : "string"
+      }, {
+        "type" : "object",
+        "required" : [ "@type", "value" ],
+        "properties" : {
+          "value" : {
+            "type" : "string"
+          },
+          "@type" : {
+            "type" : "string",
+            "$asm.type" : "http://www.w3.org/2000/01/rdf-schema#Class",
+            "$asm.lookup-property" : "http://www.w3.org/2004/02/skos/core#prefLabel"
+          }
+        }
+      } ]
+    },
+    "equipment serial number" : {
+      "$asm.property-class" : "http://purl.allotrope.org/ontologies/result#AFR_0001119",
+      "$asm.pattern" : "value datum",
+      "$asm.type" : "http://www.w3.org/2001/XMLSchema#string",
+      "oneOf" : [ {
+        "type" : "string"
+      }, {
+        "type" : "object",
+        "required" : [ "@type", "value" ],
+        "properties" : {
+          "value" : {
+            "type" : "string"
+          },
+          "@type" : {
+            "type" : "string",
+            "$asm.type" : "http://www.w3.org/2000/01/rdf-schema#Class",
+            "$asm.lookup-property" : "http://www.w3.org/2004/02/skos/core#prefLabel"
+          }
+        }
+      } ]
+    },
+    "assay comment" : {
+      "$asm.property-class" : "http://purl.allotrope.org/ontologies/result#AFR_0001980",
+      "$asm.pattern" : "value datum",
+      "$asm.type" : "http://www.w3.org/2001/XMLSchema#string",
+      "oneOf" : [ {
+        "type" : "string"
+      }, {
+        "type" : "object",
+        "required" : [ "@type", "value" ],
+        "properties" : {
+          "value" : {
+            "type" : "string"
+          },
+          "@type" : {
+            "type" : "string",
+            "$asm.type" : "http://www.w3.org/2000/01/rdf-schema#Class",
+            "$asm.lookup-property" : "http://www.w3.org/2004/02/skos/core#prefLabel"
+          }
+        }
+      } ]
+    },
+    "assay data identifier" : {
+      "$asm.property-class" : "http://purl.allotrope.org/ontologies/result#AFR_0002019",
+      "$asm.pattern" : "value datum",
+      "$asm.type" : "http://www.w3.org/2001/XMLSchema#string",
+      "oneOf" : [ {
+        "type" : "string"
+      }, {
+        "type" : "object",
+        "required" : [ "@type", "value" ],
+        "properties" : {
+          "value" : {
+            "type" : "string"
+          },
+          "@type" : {
+            "type" : "string",
+            "$asm.type" : "http://www.w3.org/2000/01/rdf-schema#Class",
+            "$asm.lookup-property" : "http://www.w3.org/2004/02/skos/core#prefLabel"
+          }
+        }
+      } ]
+    },
+    "sample preparation description" : {
+      "$asm.property-class" : "http://purl.allotrope.org/ontologies/result#AFR_0002202",
+      "$asm.pattern" : "value datum",
+      "$asm.type" : "http://www.w3.org/2001/XMLSchema#string",
+      "oneOf" : [ {
+        "type" : "string"
+      }, {
+        "type" : "object",
+        "required" : [ "@type", "value" ],
+        "properties" : {
+          "value" : {
+            "type" : "string"
+          },
+          "@type" : {
+            "type" : "string",
+            "$asm.type" : "http://www.w3.org/2000/01/rdf-schema#Class",
+            "$asm.lookup-property" : "http://www.w3.org/2004/02/skos/core#prefLabel"
+          }
+        }
+      } ]
+    },
+    "experimental data identifier" : {
+      "$asm.property-class" : "http://purl.allotrope.org/ontologies/result#AFR_0001977",
+      "$asm.pattern" : "value datum",
+      "$asm.type" : "http://www.w3.org/2001/XMLSchema#string",
+      "oneOf" : [ {
+        "type" : "string"
+      }, {
+        "type" : "object",
+        "required" : [ "@type", "value" ],
+        "properties" : {
+          "value" : {
+            "type" : "string"
+          },
+          "@type" : {
+            "type" : "string",
+            "$asm.type" : "http://www.w3.org/2000/01/rdf-schema#Class",
+            "$asm.lookup-property" : "http://www.w3.org/2004/02/skos/core#prefLabel"
+          }
+        }
+      } ]
+    },
+    "sample measurement interface type" : {
+      "$asm.property-class" : "http://purl.allotrope.org/ontologies/result#AFR_0002391",
+      "$asm.pattern" : "value datum",
+      "$asm.type" : "http://www.w3.org/2001/XMLSchema#string",
+      "oneOf" : [ {
+        "type" : "string"
+      }, {
+        "type" : "object",
+        "required" : [ "@type", "value" ],
+        "properties" : {
+          "value" : {
+            "type" : "string"
+          },
+          "@type" : {
+            "type" : "string",
+            "$asm.type" : "http://www.w3.org/2000/01/rdf-schema#Class",
+            "$asm.lookup-property" : "http://www.w3.org/2004/02/skos/core#prefLabel"
+          }
+        }
+      } ]
+    },
+    "analytical method identifier" : {
+      "$asm.property-class" : "http://purl.allotrope.org/ontologies/result#AFR_0001978",
+      "$asm.pattern" : "value datum",
+      "$asm.type" : "http://www.w3.org/2001/XMLSchema#string",
+      "oneOf" : [ {
+        "type" : "string"
+      }, {
+        "type" : "object",
+        "required" : [ "@type", "value" ],
+        "properties" : {
+          "value" : {
+            "type" : "string"
+          },
+          "@type" : {
+            "type" : "string",
+            "$asm.type" : "http://www.w3.org/2000/01/rdf-schema#Class",
+            "$asm.lookup-property" : "http://www.w3.org/2004/02/skos/core#prefLabel"
+          }
+        }
+      } ]
+    },
+    "measurement identifier" : {
+      "$asm.property-class" : "http://purl.allotrope.org/ontologies/result#AFR_0001121",
+      "$asm.pattern" : "value datum",
+      "$asm.type" : "http://www.w3.org/2001/XMLSchema#string",
+      "oneOf" : [ {
+        "type" : "string"
+      }, {
+        "type" : "object",
+        "required" : [ "@type", "value" ],
+        "properties" : {
+          "value" : {
+            "type" : "string"
+          },
+          "@type" : {
+            "type" : "string",
+            "$asm.type" : "http://www.w3.org/2000/01/rdf-schema#Class",
+            "$asm.lookup-property" : "http://www.w3.org/2004/02/skos/core#prefLabel"
+          }
+        }
+      } ]
+    },
+    "measurement time" : {
+      "$asm.property-class" : "http://purl.allotrope.org/ontologies/result#AFR_0000952",
+      "$asm.pattern" : "value datum",
+      "$asm.type" : "http://www.w3.org/2001/XMLSchema#dateTimeStamp",
+      "oneOf" : [ {
+        "type" : "string",
+        "format" : "date-time"
+      }, {
+        "type" : "object",
+        "required" : [ "@type", "value" ],
+        "properties" : {
+          "value" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "@type" : {
+            "type" : "string",
+            "$asm.type" : "http://www.w3.org/2000/01/rdf-schema#Class",
+            "$asm.lookup-property" : "http://www.w3.org/2004/02/skos/core#prefLabel"
+          }
+        }
+      } ]
+    },
+    "sample identifier" : {
+      "$asm.property-class" : "http://purl.allotrope.org/ontologies/result#AFR_0001118",
+      "$asm.pattern" : "value datum",
+      "$asm.type" : "http://www.w3.org/2001/XMLSchema#string",
+      "oneOf" : [ {
+        "type" : "string"
+      }, {
+        "type" : "object",
+        "required" : [ "@type", "value" ],
+        "properties" : {
+          "value" : {
+            "type" : "string"
+          },
+          "@type" : {
+            "type" : "string",
+            "$asm.type" : "http://www.w3.org/2000/01/rdf-schema#Class",
+            "$asm.lookup-property" : "http://www.w3.org/2004/02/skos/core#prefLabel"
+          }
+        }
+      } ]
+    },
+    "Fourier transform infrared document" : {
+      "type" : "object",
+      "$asm.property-class" : "http://purl.allotrope.org/ontologies/result#AFR_0002070",
+      "$asm.pattern" : "aggregate datum",
+      "properties" : {
+        "background document" : {
+          "type" : "object",
+          "$asm.property-class" : "http://purl.allotrope.org/ontologies/result#AFR_0002358",
+          "$asm.pattern" : "aggregate datum",
+          "required" : [ "infrared interferogram data cube", "optical velocity setting", "detector gain setting", "resolution", "aperture size setting", "number of averages" ],
+          "properties" : {
+            "infrared interferogram data cube" : {
+              "$asm.property-class" : "http://purl.allotrope.org/ontologies/result#AFR_0002057",
+              "$asm.pattern" : "datacube",
+              "type" : "object",
+              "properties" : {
+                "label" : {
+                  "type" : "string"
+                },
+                "cube-structure" : {
+                  "type" : "object",
+                  "properties" : {
+                    "dimensions" : {
+                      "type" : "array",
+                      "items" : {
+                        "type" : "object",
+                        "properties" : {
+                          "@componentDatatype" : {
+                            "description" : "Subset of XSD datatypes supported in simple models",
+                            "default" : "double",
+                            "enum" : [ "double", "float", "decimal", "integer", "byte", "int", "short", "long", "string", "boolean", "dateTime" ]
+                          },
+                          "concept" : {
+                            "description" : "A class reference is the SKOS preferred label of a class. This label MUST be unique within the transitive closure of the vocabulary referenced by the manifest.",
+                            "type" : "string",
+                            "$asm.lookup-property" : "http://www.w3.org/2004/02/skos/core#prefLabel",
+                            "$asm.type" : "http://www.w3.org/2000/01/rdf-schema#Class"
+                          },
+                          "unit" : {
+                            "description" : "A unit is referenced by its QUDT symbol. It MUST be unique within the QUDT units defined in the vocabularies declared in the manifest.",
+                            "type" : "string",
+                            "$asm.lookup-property" : "http://purl.allotrope.org/ontology/qudt-ext/schema#symbol",
+                            "$asm.type" : "http://qudt.org/schema/qudt#Unit"
+                          },
+                          "scale" : {
+                            "enum" : [ "nominal", "ordinal", "cardinal", "interval", "range" ]
+                          },
+                          "$asm.fill-value" : {
+                            "type" : [ "string", "number", "integer", "boolean" ]
+                          }
+                        },
+                        "required" : [ "@componentDatatype", "concept" ],
+                        "allOf" : [ {
+                          "$comment" : "constraint on fill values if component data type is any numeric type",
+                          "if" : {
+                            "properties" : {
+                              "@componentDatatype" : {
+                                "pattern" : "double|float"
+                              }
+                            }
+                          },
+                          "then" : {
+                            "$asm.fill-value" : {
+                              "oneOf" : [ {
+                                "type" : "number"
+                              }, {
+                                "const" : "NaN"
+                              }, {
+                                "const" : "+Infinity"
+                              }, {
+                                "const" : "-Infinity"
+                              } ],
+                              "default" : 0.0
+                            }
+                          }
+                        }, {
+                          "$comment" : "constraint on fill values if component data type is any numeric type",
+                          "if" : {
+                            "properties" : {
+                              "@componentDatatype" : {
+                                "pattern" : "integer|decimal|long|int|short|byte"
+                              }
+                            }
+                          },
+                          "then" : {
+                            "$asm.fill-value" : {
+                              "type" : "number",
+                              "default" : 0
+                            }
+                          }
+                        }, {
+                          "$comment" : "constraint on fill values if component data type is boolean",
+                          "if" : {
+                            "properties" : {
+                              "@componentDatatype" : {
+                                "const" : "boolean"
+                              }
+                            }
+                          },
+                          "then" : {
+                            "$asm.fill-value" : {
+                              "type" : "boolean",
+                              "default" : false
+                            }
+                          }
+                        }, {
+                          "$comment" : "constraint on fill values if component data type is string",
+                          "if" : {
+                            "properties" : {
+                              "@componentDatatype" : {
+                                "pattern" : "string|dateTime|date"
+                              }
+                            }
+                          },
+                          "then" : {
+                            "$asm.fill-value" : {
+                              "type" : "string",
+                              "default" : ""
+                            }
+                          }
+                        } ]
+                      },
+                      "unique" : true,
+                      "minItems" : 1,
+                      "maxItems" : 1,
+                      "prefixItems" : [ {
+                        "properties" : {
+                          "concept" : {
+                            "const" : "length"
+                          },
+                          "unit" : {
+                            "const" : "cm"
+                          },
+                          "@componentDatatype" : {
+                            "const" : "double"
+                          }
+                        }
+                      } ]
+                    },
+                    "measures" : {
+                      "type" : "array",
+                      "items" : {
+                        "type" : "object",
+                        "properties" : {
+                          "@componentDatatype" : {
+                            "description" : "Subset of XSD datatypes supported in simple models",
+                            "default" : "double",
+                            "enum" : [ "double", "float", "decimal", "integer", "byte", "int", "short", "long", "string", "boolean", "dateTime" ]
+                          },
+                          "concept" : {
+                            "description" : "A class reference is the SKOS preferred label of a class. This label MUST be unique within the transitive closure of the vocabulary referenced by the manifest.",
+                            "type" : "string",
+                            "$asm.lookup-property" : "http://www.w3.org/2004/02/skos/core#prefLabel",
+                            "$asm.type" : "http://www.w3.org/2000/01/rdf-schema#Class"
+                          },
+                          "unit" : {
+                            "description" : "A unit is referenced by its QUDT symbol. It MUST be unique within the QUDT units defined in the vocabularies declared in the manifest.",
+                            "type" : "string",
+                            "$asm.lookup-property" : "http://purl.allotrope.org/ontology/qudt-ext/schema#symbol",
+                            "$asm.type" : "http://qudt.org/schema/qudt#Unit"
+                          },
+                          "scale" : {
+                            "enum" : [ "nominal", "ordinal", "cardinal", "interval", "range" ]
+                          },
+                          "$asm.fill-value" : {
+                            "type" : [ "string", "number", "integer", "boolean" ]
+                          }
+                        },
+                        "required" : [ "@componentDatatype", "concept" ],
+                        "allOf" : [ {
+                          "$comment" : "constraint on fill values if component data type is any numeric type",
+                          "if" : {
+                            "properties" : {
+                              "@componentDatatype" : {
+                                "pattern" : "double|float"
+                              }
+                            }
+                          },
+                          "then" : {
+                            "$asm.fill-value" : {
+                              "oneOf" : [ {
+                                "type" : "number"
+                              }, {
+                                "const" : "NaN"
+                              }, {
+                                "const" : "+Infinity"
+                              }, {
+                                "const" : "-Infinity"
+                              } ],
+                              "default" : 0.0
+                            }
+                          }
+                        }, {
+                          "$comment" : "constraint on fill values if component data type is any numeric type",
+                          "if" : {
+                            "properties" : {
+                              "@componentDatatype" : {
+                                "pattern" : "integer|decimal|long|int|short|byte"
+                              }
+                            }
+                          },
+                          "then" : {
+                            "$asm.fill-value" : {
+                              "type" : "number",
+                              "default" : 0
+                            }
+                          }
+                        }, {
+                          "$comment" : "constraint on fill values if component data type is boolean",
+                          "if" : {
+                            "properties" : {
+                              "@componentDatatype" : {
+                                "const" : "boolean"
+                              }
+                            }
+                          },
+                          "then" : {
+                            "$asm.fill-value" : {
+                              "type" : "boolean",
+                              "default" : false
+                            }
+                          }
+                        }, {
+                          "$comment" : "constraint on fill values if component data type is string",
+                          "if" : {
+                            "properties" : {
+                              "@componentDatatype" : {
+                                "pattern" : "string|dateTime|date"
+                              }
+                            }
+                          },
+                          "then" : {
+                            "$asm.fill-value" : {
+                              "type" : "string",
+                              "default" : ""
+                            }
+                          }
+                        } ]
+                      },
+                      "unique" : true,
+                      "minItems" : 1,
+                      "maxItems" : 1,
+                      "contains" : {
+                        "oneOf" : [ {
+                          "properties" : {
+                            "concept" : {
+                              "const" : "relative intensity"
+                            },
+                            "unit" : {
+                              "const" : "(unitless)"
+                            },
+                            "@componentDatatype" : {
+                              "const" : "double"
+                            }
+                          }
+                        } ]
+                      }
+                    }
+                  },
+                  "required" : [ "dimensions", "measures" ]
+                },
+                "data" : {
+                  "allOf" : [ {
+                    "properties" : {
+                      "dimensions" : {
+                        "type" : "array",
+                        "items" : {
+                          "oneOf" : [ {
+                            "$comment" : "homogenous array of data used in explicit dimension arrays",
+                            "oneOf" : [ {
+                              "$comment" : "homogenous array of numbers",
+                              "type" : "array",
+                              "items" : {
+                                "type" : "number"
+                              }
+                            }, {
+                              "$comment" : "homogenous array of booleans",
+                              "type" : "array",
+                              "items" : {
+                                "type" : "boolean"
+                              }
+                            }, {
+                              "$comment" : "homogenous array of strings",
+                              "type" : "array",
+                              "items" : {
+                                "type" : "string"
+                              }
+                            } ]
+                          }, {
+                            "type" : "object",
+                            "properties" : {
+                              "type" : {
+                                "enum" : [ "linear", "logarithmic" ],
+                                "default" : "linear"
+                              },
+                              "start" : {
+                                "type" : "number",
+                                "default" : 1
+                              },
+                              "length" : {
+                                "type" : "number"
+                              },
+                              "incr" : {
+                                "type" : "number",
+                                "default" : 1
+                              }
+                            }
+                          } ]
+                        }
+                      }
+                    },
+                    "required" : [ "dimensions" ]
+                  }, {
+                    "oneOf" : [ {
+                      "properties" : {
+                        "measures" : {
+                          "type" : "array",
+                          "items" : {
+                            "$comment" : "homogenous array of data used in explicit measure arrays, may contain null values",
+                            "oneOf" : [ {
+                              "$comment" : "homogenous array of numbers, may contain null values",
+                              "type" : "array",
+                              "items" : {
+                                "anyOf" : [ {
+                                  "type" : "number"
+                                }, {
+                                  "type" : "null"
+                                } ]
+                              }
+                            }, {
+                              "$comment" : "homogenous array of booleans, may contain null values",
+                              "type" : "array",
+                              "items" : {
+                                "anyOf" : [ {
+                                  "type" : "boolean"
+                                }, {
+                                  "type" : "null"
+                                } ]
+                              }
+                            }, {
+                              "$comment" : "homogenous array of strings, may contain null values",
+                              "type" : "array",
+                              "items" : {
+                                "anyOf" : [ {
+                                  "type" : "string"
+                                }, {
+                                  "type" : "null"
+                                } ]
+                              }
+                            } ]
+                          }
+                        }
+                      },
+                      "required" : [ "measures" ]
+                    }, {
+                      "properties" : {
+                        "points" : {
+                          "type" : "array",
+                          "items" : {
+                            "$comment" : "heterogenous array of data used in point arrays",
+                            "type" : "array",
+                            "items" : {
+                              "oneOf" : [ {
+                                "type" : "number"
+                              }, {
+                                "type" : "boolean"
+                              }, {
+                                "type" : "string"
+                              }, {
+                                "type" : "null"
+                              } ]
+                            }
+                          }
+                        }
+                      },
+                      "required" : [ "points" ]
+                    } ]
+                  } ]
+                }
+              }
+            },
+            "optical velocity setting" : {
+              "$asm.property-class" : "http://purl.allotrope.org/ontologies/result#AFR_0002251",
+              "$asm.pattern" : "quantity datum",
+              "type" : "object",
+              "properties" : {
+                "value" : {
+                  "type" : "number"
+                },
+                "unit" : {
+                  "description" : "A unit is referenced by its QUDT symbol. It MUST be unique within the QUDT units defined in the vocabularies declared in the manifest.",
+                  "type" : "string",
+                  "$asm.lookup-property" : "http://purl.allotrope.org/ontology/qudt-ext/schema#symbol",
+                  "$asm.type" : "http://qudt.org/schema/qudt#Unit",
+                  "const" : "cm/s",
+                  "$asm.unit-iri" : "http://qudt.org/vocab/unit#CentimeterPerSecond"
+                },
+                "@type" : {
+                  "description" : "A class reference is the SKOS preferred label of a class. This label MUST be unique within the transitive closure of the vocabulary referenced by the manifest.",
+                  "type" : "string",
+                  "$asm.lookup-property" : "http://www.w3.org/2004/02/skos/core#prefLabel",
+                  "$asm.type" : "http://www.w3.org/2000/01/rdf-schema#Class"
+                }
+              },
+              "$asm.type" : "http://qudt.org/schema/qudt#QuantityValue",
+              "required" : [ "value", "unit" ]
+            },
+            "detector gain setting" : {
+              "$asm.property-class" : "http://purl.allotrope.org/ontologies/result#AFR_0002250",
+              "$asm.pattern" : "quantity datum",
+              "type" : "object",
+              "properties" : {
+                "value" : {
+                  "type" : "number"
+                },
+                "unit" : {
+                  "description" : "A unit is referenced by its QUDT symbol. It MUST be unique within the QUDT units defined in the vocabularies declared in the manifest.",
+                  "type" : "string",
+                  "$asm.lookup-property" : "http://purl.allotrope.org/ontology/qudt-ext/schema#symbol",
+                  "$asm.type" : "http://qudt.org/schema/qudt#Unit",
+                  "const" : "(unitless)",
+                  "$asm.unit-iri" : "http://purl.allotrope.org/ontology/qudt-ext/unit#Unitless"
+                },
+                "@type" : {
+                  "description" : "A class reference is the SKOS preferred label of a class. This label MUST be unique within the transitive closure of the vocabulary referenced by the manifest.",
+                  "type" : "string",
+                  "$asm.lookup-property" : "http://www.w3.org/2004/02/skos/core#prefLabel",
+                  "$asm.type" : "http://www.w3.org/2000/01/rdf-schema#Class"
+                }
+              },
+              "$asm.type" : "http://qudt.org/schema/qudt#QuantityValue",
+              "required" : [ "value", "unit" ]
+            },
+            "resolution" : {
+              "$asm.property-class" : "http://purl.allotrope.org/ontologies/result#AFR_0001619",
+              "$asm.pattern" : "quantity datum",
+              "type" : "object",
+              "properties" : {
+                "value" : {
+                  "type" : "number"
+                },
+                "unit" : {
+                  "description" : "A unit is referenced by its QUDT symbol. It MUST be unique within the QUDT units defined in the vocabularies declared in the manifest.",
+                  "type" : "string",
+                  "$asm.lookup-property" : "http://purl.allotrope.org/ontology/qudt-ext/schema#symbol",
+                  "$asm.type" : "http://qudt.org/schema/qudt#Unit",
+                  "const" : "1/cm",
+                  "$asm.unit-iri" : "http://purl.allotrope.org/ontology/qudt-ext/unit#ReciprocalCentimeter"
+                },
+                "@type" : {
+                  "description" : "A class reference is the SKOS preferred label of a class. This label MUST be unique within the transitive closure of the vocabulary referenced by the manifest.",
+                  "type" : "string",
+                  "$asm.lookup-property" : "http://www.w3.org/2004/02/skos/core#prefLabel",
+                  "$asm.type" : "http://www.w3.org/2000/01/rdf-schema#Class"
+                }
+              },
+              "$asm.type" : "http://qudt.org/schema/qudt#QuantityValue",
+              "required" : [ "value", "unit" ]
+            },
+            "aperture size setting" : {
+              "$asm.property-class" : "http://purl.allotrope.org/ontologies/result#AFR_0002389",
+              "$asm.pattern" : "quantity datum",
+              "type" : "object",
+              "properties" : {
+                "value" : {
+                  "type" : "number"
+                },
+                "unit" : {
+                  "description" : "A unit is referenced by its QUDT symbol. It MUST be unique within the QUDT units defined in the vocabularies declared in the manifest.",
+                  "type" : "string",
+                  "$asm.lookup-property" : "http://purl.allotrope.org/ontology/qudt-ext/schema#symbol",
+                  "$asm.type" : "http://qudt.org/schema/qudt#Unit",
+                  "const" : "nm",
+                  "$asm.unit-iri" : "http://purl.allotrope.org/ontology/qudt-ext/unit#Nanometer"
+                },
+                "@type" : {
+                  "description" : "A class reference is the SKOS preferred label of a class. This label MUST be unique within the transitive closure of the vocabulary referenced by the manifest.",
+                  "type" : "string",
+                  "$asm.lookup-property" : "http://www.w3.org/2004/02/skos/core#prefLabel",
+                  "$asm.type" : "http://www.w3.org/2000/01/rdf-schema#Class"
+                }
+              },
+              "$asm.type" : "http://qudt.org/schema/qudt#QuantityValue",
+              "required" : [ "value", "unit" ]
+            },
+            "number of averages" : {
+              "$asm.property-class" : "http://purl.allotrope.org/ontologies/result#AFR_0001672",
+              "$asm.pattern" : "quantity datum",
+              "type" : "object",
+              "properties" : {
+                "value" : {
+                  "type" : "number"
+                },
+                "unit" : {
+                  "description" : "A unit is referenced by its QUDT symbol. It MUST be unique within the QUDT units defined in the vocabularies declared in the manifest.",
+                  "type" : "string",
+                  "$asm.lookup-property" : "http://purl.allotrope.org/ontology/qudt-ext/schema#symbol",
+                  "$asm.type" : "http://qudt.org/schema/qudt#Unit",
+                  "const" : "(unitless)",
+                  "$asm.unit-iri" : "http://purl.allotrope.org/ontology/qudt-ext/unit#Unitless"
+                },
+                "@type" : {
+                  "description" : "A class reference is the SKOS preferred label of a class. This label MUST be unique within the transitive closure of the vocabulary referenced by the manifest.",
+                  "type" : "string",
+                  "$asm.lookup-property" : "http://www.w3.org/2004/02/skos/core#prefLabel",
+                  "$asm.type" : "http://www.w3.org/2000/01/rdf-schema#Class"
+                }
+              },
+              "$asm.type" : "http://qudt.org/schema/qudt#QuantityValue",
+              "required" : [ "value", "unit" ]
+            }
+          }
+        },
+        "measurement document" : {
+          "type" : "object",
+          "$asm.property-class" : "http://purl.allotrope.org/ontologies/result#AFR_0002375",
+          "$asm.pattern" : "aggregate datum",
+          "required" : [ "optical velocity setting", "transmittance spectrum data cube", "resolution", "number of averages", "infrared interferogram data cube", "reflectance spectrum data cube", "detector gain setting", "absorption spectrum data cube", "aperture size setting" ],
+          "properties" : {
+            "optical velocity setting" : {
+              "$asm.property-class" : "http://purl.allotrope.org/ontologies/result#AFR_0002251",
+              "$asm.pattern" : "quantity datum",
+              "type" : "object",
+              "properties" : {
+                "value" : {
+                  "type" : "number"
+                },
+                "unit" : {
+                  "description" : "A unit is referenced by its QUDT symbol. It MUST be unique within the QUDT units defined in the vocabularies declared in the manifest.",
+                  "type" : "string",
+                  "$asm.lookup-property" : "http://purl.allotrope.org/ontology/qudt-ext/schema#symbol",
+                  "$asm.type" : "http://qudt.org/schema/qudt#Unit",
+                  "const" : "cm/s",
+                  "$asm.unit-iri" : "http://qudt.org/vocab/unit#CentimeterPerSecond"
+                },
+                "@type" : {
+                  "description" : "A class reference is the SKOS preferred label of a class. This label MUST be unique within the transitive closure of the vocabulary referenced by the manifest.",
+                  "type" : "string",
+                  "$asm.lookup-property" : "http://www.w3.org/2004/02/skos/core#prefLabel",
+                  "$asm.type" : "http://www.w3.org/2000/01/rdf-schema#Class"
+                }
+              },
+              "$asm.type" : "http://qudt.org/schema/qudt#QuantityValue",
+              "required" : [ "value", "unit" ]
+            },
+            "transmittance spectrum data cube" : {
+              "$asm.property-class" : "http://purl.allotrope.org/ontologies/result#AFR_0002285",
+              "$asm.pattern" : "datacube",
+              "type" : "object",
+              "properties" : {
+                "label" : {
+                  "type" : "string"
+                },
+                "cube-structure" : {
+                  "type" : "object",
+                  "properties" : {
+                    "dimensions" : {
+                      "type" : "array",
+                      "items" : {
+                        "type" : "object",
+                        "properties" : {
+                          "@componentDatatype" : {
+                            "description" : "Subset of XSD datatypes supported in simple models",
+                            "default" : "double",
+                            "enum" : [ "double", "float", "decimal", "integer", "byte", "int", "short", "long", "string", "boolean", "dateTime" ]
+                          },
+                          "concept" : {
+                            "description" : "A class reference is the SKOS preferred label of a class. This label MUST be unique within the transitive closure of the vocabulary referenced by the manifest.",
+                            "type" : "string",
+                            "$asm.lookup-property" : "http://www.w3.org/2004/02/skos/core#prefLabel",
+                            "$asm.type" : "http://www.w3.org/2000/01/rdf-schema#Class"
+                          },
+                          "unit" : {
+                            "description" : "A unit is referenced by its QUDT symbol. It MUST be unique within the QUDT units defined in the vocabularies declared in the manifest.",
+                            "type" : "string",
+                            "$asm.lookup-property" : "http://purl.allotrope.org/ontology/qudt-ext/schema#symbol",
+                            "$asm.type" : "http://qudt.org/schema/qudt#Unit"
+                          },
+                          "scale" : {
+                            "enum" : [ "nominal", "ordinal", "cardinal", "interval", "range" ]
+                          },
+                          "$asm.fill-value" : {
+                            "type" : [ "string", "number", "integer", "boolean" ]
+                          }
+                        },
+                        "required" : [ "@componentDatatype", "concept" ],
+                        "allOf" : [ {
+                          "$comment" : "constraint on fill values if component data type is any numeric type",
+                          "if" : {
+                            "properties" : {
+                              "@componentDatatype" : {
+                                "pattern" : "double|float"
+                              }
+                            }
+                          },
+                          "then" : {
+                            "$asm.fill-value" : {
+                              "oneOf" : [ {
+                                "type" : "number"
+                              }, {
+                                "const" : "NaN"
+                              }, {
+                                "const" : "+Infinity"
+                              }, {
+                                "const" : "-Infinity"
+                              } ],
+                              "default" : 0.0
+                            }
+                          }
+                        }, {
+                          "$comment" : "constraint on fill values if component data type is any numeric type",
+                          "if" : {
+                            "properties" : {
+                              "@componentDatatype" : {
+                                "pattern" : "integer|decimal|long|int|short|byte"
+                              }
+                            }
+                          },
+                          "then" : {
+                            "$asm.fill-value" : {
+                              "type" : "number",
+                              "default" : 0
+                            }
+                          }
+                        }, {
+                          "$comment" : "constraint on fill values if component data type is boolean",
+                          "if" : {
+                            "properties" : {
+                              "@componentDatatype" : {
+                                "const" : "boolean"
+                              }
+                            }
+                          },
+                          "then" : {
+                            "$asm.fill-value" : {
+                              "type" : "boolean",
+                              "default" : false
+                            }
+                          }
+                        }, {
+                          "$comment" : "constraint on fill values if component data type is string",
+                          "if" : {
+                            "properties" : {
+                              "@componentDatatype" : {
+                                "pattern" : "string|dateTime|date"
+                              }
+                            }
+                          },
+                          "then" : {
+                            "$asm.fill-value" : {
+                              "type" : "string",
+                              "default" : ""
+                            }
+                          }
+                        } ]
+                      },
+                      "unique" : true,
+                      "minItems" : 1,
+                      "maxItems" : 1,
+                      "prefixItems" : [ {
+                        "properties" : {
+                          "concept" : {
+                            "const" : "wavelength"
+                          },
+                          "unit" : {
+                            "const" : "1/cm"
+                          },
+                          "@componentDatatype" : {
+                            "const" : "double"
+                          }
+                        }
+                      } ]
+                    },
+                    "measures" : {
+                      "type" : "array",
+                      "items" : {
+                        "type" : "object",
+                        "properties" : {
+                          "@componentDatatype" : {
+                            "description" : "Subset of XSD datatypes supported in simple models",
+                            "default" : "double",
+                            "enum" : [ "double", "float", "decimal", "integer", "byte", "int", "short", "long", "string", "boolean", "dateTime" ]
+                          },
+                          "concept" : {
+                            "description" : "A class reference is the SKOS preferred label of a class. This label MUST be unique within the transitive closure of the vocabulary referenced by the manifest.",
+                            "type" : "string",
+                            "$asm.lookup-property" : "http://www.w3.org/2004/02/skos/core#prefLabel",
+                            "$asm.type" : "http://www.w3.org/2000/01/rdf-schema#Class"
+                          },
+                          "unit" : {
+                            "description" : "A unit is referenced by its QUDT symbol. It MUST be unique within the QUDT units defined in the vocabularies declared in the manifest.",
+                            "type" : "string",
+                            "$asm.lookup-property" : "http://purl.allotrope.org/ontology/qudt-ext/schema#symbol",
+                            "$asm.type" : "http://qudt.org/schema/qudt#Unit"
+                          },
+                          "scale" : {
+                            "enum" : [ "nominal", "ordinal", "cardinal", "interval", "range" ]
+                          },
+                          "$asm.fill-value" : {
+                            "type" : [ "string", "number", "integer", "boolean" ]
+                          }
+                        },
+                        "required" : [ "@componentDatatype", "concept" ],
+                        "allOf" : [ {
+                          "$comment" : "constraint on fill values if component data type is any numeric type",
+                          "if" : {
+                            "properties" : {
+                              "@componentDatatype" : {
+                                "pattern" : "double|float"
+                              }
+                            }
+                          },
+                          "then" : {
+                            "$asm.fill-value" : {
+                              "oneOf" : [ {
+                                "type" : "number"
+                              }, {
+                                "const" : "NaN"
+                              }, {
+                                "const" : "+Infinity"
+                              }, {
+                                "const" : "-Infinity"
+                              } ],
+                              "default" : 0.0
+                            }
+                          }
+                        }, {
+                          "$comment" : "constraint on fill values if component data type is any numeric type",
+                          "if" : {
+                            "properties" : {
+                              "@componentDatatype" : {
+                                "pattern" : "integer|decimal|long|int|short|byte"
+                              }
+                            }
+                          },
+                          "then" : {
+                            "$asm.fill-value" : {
+                              "type" : "number",
+                              "default" : 0
+                            }
+                          }
+                        }, {
+                          "$comment" : "constraint on fill values if component data type is boolean",
+                          "if" : {
+                            "properties" : {
+                              "@componentDatatype" : {
+                                "const" : "boolean"
+                              }
+                            }
+                          },
+                          "then" : {
+                            "$asm.fill-value" : {
+                              "type" : "boolean",
+                              "default" : false
+                            }
+                          }
+                        }, {
+                          "$comment" : "constraint on fill values if component data type is string",
+                          "if" : {
+                            "properties" : {
+                              "@componentDatatype" : {
+                                "pattern" : "string|dateTime|date"
+                              }
+                            }
+                          },
+                          "then" : {
+                            "$asm.fill-value" : {
+                              "type" : "string",
+                              "default" : ""
+                            }
+                          }
+                        } ]
+                      },
+                      "unique" : true,
+                      "minItems" : 1,
+                      "maxItems" : 1,
+                      "contains" : {
+                        "oneOf" : [ {
+                          "properties" : {
+                            "concept" : {
+                              "const" : "transmittance"
+                            },
+                            "unit" : {
+                              "const" : "%"
+                            },
+                            "@componentDatatype" : {
+                              "const" : "double"
+                            }
+                          }
+                        } ]
+                      }
+                    }
+                  },
+                  "required" : [ "dimensions", "measures" ]
+                },
+                "data" : {
+                  "allOf" : [ {
+                    "properties" : {
+                      "dimensions" : {
+                        "type" : "array",
+                        "items" : {
+                          "oneOf" : [ {
+                            "$comment" : "homogenous array of data used in explicit dimension arrays",
+                            "oneOf" : [ {
+                              "$comment" : "homogenous array of numbers",
+                              "type" : "array",
+                              "items" : {
+                                "type" : "number"
+                              }
+                            }, {
+                              "$comment" : "homogenous array of booleans",
+                              "type" : "array",
+                              "items" : {
+                                "type" : "boolean"
+                              }
+                            }, {
+                              "$comment" : "homogenous array of strings",
+                              "type" : "array",
+                              "items" : {
+                                "type" : "string"
+                              }
+                            } ]
+                          }, {
+                            "type" : "object",
+                            "properties" : {
+                              "type" : {
+                                "enum" : [ "linear", "logarithmic" ],
+                                "default" : "linear"
+                              },
+                              "start" : {
+                                "type" : "number",
+                                "default" : 1
+                              },
+                              "length" : {
+                                "type" : "number"
+                              },
+                              "incr" : {
+                                "type" : "number",
+                                "default" : 1
+                              }
+                            }
+                          } ]
+                        }
+                      }
+                    },
+                    "required" : [ "dimensions" ]
+                  }, {
+                    "oneOf" : [ {
+                      "properties" : {
+                        "measures" : {
+                          "type" : "array",
+                          "items" : {
+                            "$comment" : "homogenous array of data used in explicit measure arrays, may contain null values",
+                            "oneOf" : [ {
+                              "$comment" : "homogenous array of numbers, may contain null values",
+                              "type" : "array",
+                              "items" : {
+                                "anyOf" : [ {
+                                  "type" : "number"
+                                }, {
+                                  "type" : "null"
+                                } ]
+                              }
+                            }, {
+                              "$comment" : "homogenous array of booleans, may contain null values",
+                              "type" : "array",
+                              "items" : {
+                                "anyOf" : [ {
+                                  "type" : "boolean"
+                                }, {
+                                  "type" : "null"
+                                } ]
+                              }
+                            }, {
+                              "$comment" : "homogenous array of strings, may contain null values",
+                              "type" : "array",
+                              "items" : {
+                                "anyOf" : [ {
+                                  "type" : "string"
+                                }, {
+                                  "type" : "null"
+                                } ]
+                              }
+                            } ]
+                          }
+                        }
+                      },
+                      "required" : [ "measures" ]
+                    }, {
+                      "properties" : {
+                        "points" : {
+                          "type" : "array",
+                          "items" : {
+                            "$comment" : "heterogenous array of data used in point arrays",
+                            "type" : "array",
+                            "items" : {
+                              "oneOf" : [ {
+                                "type" : "number"
+                              }, {
+                                "type" : "boolean"
+                              }, {
+                                "type" : "string"
+                              }, {
+                                "type" : "null"
+                              } ]
+                            }
+                          }
+                        }
+                      },
+                      "required" : [ "points" ]
+                    } ]
+                  } ]
+                }
+              }
+            },
+            "resolution" : {
+              "$asm.property-class" : "http://purl.allotrope.org/ontologies/result#AFR_0001619",
+              "$asm.pattern" : "quantity datum",
+              "type" : "object",
+              "properties" : {
+                "value" : {
+                  "type" : "number"
+                },
+                "unit" : {
+                  "description" : "A unit is referenced by its QUDT symbol. It MUST be unique within the QUDT units defined in the vocabularies declared in the manifest.",
+                  "type" : "string",
+                  "$asm.lookup-property" : "http://purl.allotrope.org/ontology/qudt-ext/schema#symbol",
+                  "$asm.type" : "http://qudt.org/schema/qudt#Unit",
+                  "const" : "1/cm",
+                  "$asm.unit-iri" : "http://purl.allotrope.org/ontology/qudt-ext/unit#ReciprocalCentimeter"
+                },
+                "@type" : {
+                  "description" : "A class reference is the SKOS preferred label of a class. This label MUST be unique within the transitive closure of the vocabulary referenced by the manifest.",
+                  "type" : "string",
+                  "$asm.lookup-property" : "http://www.w3.org/2004/02/skos/core#prefLabel",
+                  "$asm.type" : "http://www.w3.org/2000/01/rdf-schema#Class"
+                }
+              },
+              "$asm.type" : "http://qudt.org/schema/qudt#QuantityValue",
+              "required" : [ "value", "unit" ]
+            },
+            "number of averages" : {
+              "$asm.property-class" : "http://purl.allotrope.org/ontologies/result#AFR_0001672",
+              "$asm.pattern" : "quantity datum",
+              "type" : "object",
+              "properties" : {
+                "value" : {
+                  "type" : "number"
+                },
+                "unit" : {
+                  "description" : "A unit is referenced by its QUDT symbol. It MUST be unique within the QUDT units defined in the vocabularies declared in the manifest.",
+                  "type" : "string",
+                  "$asm.lookup-property" : "http://purl.allotrope.org/ontology/qudt-ext/schema#symbol",
+                  "$asm.type" : "http://qudt.org/schema/qudt#Unit",
+                  "const" : "(unitless)",
+                  "$asm.unit-iri" : "http://purl.allotrope.org/ontology/qudt-ext/unit#Unitless"
+                },
+                "@type" : {
+                  "description" : "A class reference is the SKOS preferred label of a class. This label MUST be unique within the transitive closure of the vocabulary referenced by the manifest.",
+                  "type" : "string",
+                  "$asm.lookup-property" : "http://www.w3.org/2004/02/skos/core#prefLabel",
+                  "$asm.type" : "http://www.w3.org/2000/01/rdf-schema#Class"
+                }
+              },
+              "$asm.type" : "http://qudt.org/schema/qudt#QuantityValue",
+              "required" : [ "value", "unit" ]
+            },
+            "infrared interferogram data cube" : {
+              "$asm.property-class" : "http://purl.allotrope.org/ontologies/result#AFR_0002057",
+              "$asm.pattern" : "datacube",
+              "type" : "object",
+              "properties" : {
+                "label" : {
+                  "type" : "string"
+                },
+                "cube-structure" : {
+                  "type" : "object",
+                  "properties" : {
+                    "dimensions" : {
+                      "type" : "array",
+                      "items" : {
+                        "type" : "object",
+                        "properties" : {
+                          "@componentDatatype" : {
+                            "description" : "Subset of XSD datatypes supported in simple models",
+                            "default" : "double",
+                            "enum" : [ "double", "float", "decimal", "integer", "byte", "int", "short", "long", "string", "boolean", "dateTime" ]
+                          },
+                          "concept" : {
+                            "description" : "A class reference is the SKOS preferred label of a class. This label MUST be unique within the transitive closure of the vocabulary referenced by the manifest.",
+                            "type" : "string",
+                            "$asm.lookup-property" : "http://www.w3.org/2004/02/skos/core#prefLabel",
+                            "$asm.type" : "http://www.w3.org/2000/01/rdf-schema#Class"
+                          },
+                          "unit" : {
+                            "description" : "A unit is referenced by its QUDT symbol. It MUST be unique within the QUDT units defined in the vocabularies declared in the manifest.",
+                            "type" : "string",
+                            "$asm.lookup-property" : "http://purl.allotrope.org/ontology/qudt-ext/schema#symbol",
+                            "$asm.type" : "http://qudt.org/schema/qudt#Unit"
+                          },
+                          "scale" : {
+                            "enum" : [ "nominal", "ordinal", "cardinal", "interval", "range" ]
+                          },
+                          "$asm.fill-value" : {
+                            "type" : [ "string", "number", "integer", "boolean" ]
+                          }
+                        },
+                        "required" : [ "@componentDatatype", "concept" ],
+                        "allOf" : [ {
+                          "$comment" : "constraint on fill values if component data type is any numeric type",
+                          "if" : {
+                            "properties" : {
+                              "@componentDatatype" : {
+                                "pattern" : "double|float"
+                              }
+                            }
+                          },
+                          "then" : {
+                            "$asm.fill-value" : {
+                              "oneOf" : [ {
+                                "type" : "number"
+                              }, {
+                                "const" : "NaN"
+                              }, {
+                                "const" : "+Infinity"
+                              }, {
+                                "const" : "-Infinity"
+                              } ],
+                              "default" : 0.0
+                            }
+                          }
+                        }, {
+                          "$comment" : "constraint on fill values if component data type is any numeric type",
+                          "if" : {
+                            "properties" : {
+                              "@componentDatatype" : {
+                                "pattern" : "integer|decimal|long|int|short|byte"
+                              }
+                            }
+                          },
+                          "then" : {
+                            "$asm.fill-value" : {
+                              "type" : "number",
+                              "default" : 0
+                            }
+                          }
+                        }, {
+                          "$comment" : "constraint on fill values if component data type is boolean",
+                          "if" : {
+                            "properties" : {
+                              "@componentDatatype" : {
+                                "const" : "boolean"
+                              }
+                            }
+                          },
+                          "then" : {
+                            "$asm.fill-value" : {
+                              "type" : "boolean",
+                              "default" : false
+                            }
+                          }
+                        }, {
+                          "$comment" : "constraint on fill values if component data type is string",
+                          "if" : {
+                            "properties" : {
+                              "@componentDatatype" : {
+                                "pattern" : "string|dateTime|date"
+                              }
+                            }
+                          },
+                          "then" : {
+                            "$asm.fill-value" : {
+                              "type" : "string",
+                              "default" : ""
+                            }
+                          }
+                        } ]
+                      },
+                      "unique" : true,
+                      "minItems" : 1,
+                      "maxItems" : 1,
+                      "prefixItems" : [ {
+                        "properties" : {
+                          "concept" : {
+                            "const" : "length"
+                          },
+                          "unit" : {
+                            "const" : "cm"
+                          },
+                          "@componentDatatype" : {
+                            "const" : "double"
+                          }
+                        }
+                      } ]
+                    },
+                    "measures" : {
+                      "type" : "array",
+                      "items" : {
+                        "type" : "object",
+                        "properties" : {
+                          "@componentDatatype" : {
+                            "description" : "Subset of XSD datatypes supported in simple models",
+                            "default" : "double",
+                            "enum" : [ "double", "float", "decimal", "integer", "byte", "int", "short", "long", "string", "boolean", "dateTime" ]
+                          },
+                          "concept" : {
+                            "description" : "A class reference is the SKOS preferred label of a class. This label MUST be unique within the transitive closure of the vocabulary referenced by the manifest.",
+                            "type" : "string",
+                            "$asm.lookup-property" : "http://www.w3.org/2004/02/skos/core#prefLabel",
+                            "$asm.type" : "http://www.w3.org/2000/01/rdf-schema#Class"
+                          },
+                          "unit" : {
+                            "description" : "A unit is referenced by its QUDT symbol. It MUST be unique within the QUDT units defined in the vocabularies declared in the manifest.",
+                            "type" : "string",
+                            "$asm.lookup-property" : "http://purl.allotrope.org/ontology/qudt-ext/schema#symbol",
+                            "$asm.type" : "http://qudt.org/schema/qudt#Unit"
+                          },
+                          "scale" : {
+                            "enum" : [ "nominal", "ordinal", "cardinal", "interval", "range" ]
+                          },
+                          "$asm.fill-value" : {
+                            "type" : [ "string", "number", "integer", "boolean" ]
+                          }
+                        },
+                        "required" : [ "@componentDatatype", "concept" ],
+                        "allOf" : [ {
+                          "$comment" : "constraint on fill values if component data type is any numeric type",
+                          "if" : {
+                            "properties" : {
+                              "@componentDatatype" : {
+                                "pattern" : "double|float"
+                              }
+                            }
+                          },
+                          "then" : {
+                            "$asm.fill-value" : {
+                              "oneOf" : [ {
+                                "type" : "number"
+                              }, {
+                                "const" : "NaN"
+                              }, {
+                                "const" : "+Infinity"
+                              }, {
+                                "const" : "-Infinity"
+                              } ],
+                              "default" : 0.0
+                            }
+                          }
+                        }, {
+                          "$comment" : "constraint on fill values if component data type is any numeric type",
+                          "if" : {
+                            "properties" : {
+                              "@componentDatatype" : {
+                                "pattern" : "integer|decimal|long|int|short|byte"
+                              }
+                            }
+                          },
+                          "then" : {
+                            "$asm.fill-value" : {
+                              "type" : "number",
+                              "default" : 0
+                            }
+                          }
+                        }, {
+                          "$comment" : "constraint on fill values if component data type is boolean",
+                          "if" : {
+                            "properties" : {
+                              "@componentDatatype" : {
+                                "const" : "boolean"
+                              }
+                            }
+                          },
+                          "then" : {
+                            "$asm.fill-value" : {
+                              "type" : "boolean",
+                              "default" : false
+                            }
+                          }
+                        }, {
+                          "$comment" : "constraint on fill values if component data type is string",
+                          "if" : {
+                            "properties" : {
+                              "@componentDatatype" : {
+                                "pattern" : "string|dateTime|date"
+                              }
+                            }
+                          },
+                          "then" : {
+                            "$asm.fill-value" : {
+                              "type" : "string",
+                              "default" : ""
+                            }
+                          }
+                        } ]
+                      },
+                      "unique" : true,
+                      "minItems" : 1,
+                      "maxItems" : 1,
+                      "contains" : {
+                        "oneOf" : [ {
+                          "properties" : {
+                            "concept" : {
+                              "const" : "relative intensity"
+                            },
+                            "unit" : {
+                              "const" : "(unitless)"
+                            },
+                            "@componentDatatype" : {
+                              "const" : "double"
+                            }
+                          }
+                        } ]
+                      }
+                    }
+                  },
+                  "required" : [ "dimensions", "measures" ]
+                },
+                "data" : {
+                  "allOf" : [ {
+                    "properties" : {
+                      "dimensions" : {
+                        "type" : "array",
+                        "items" : {
+                          "oneOf" : [ {
+                            "$comment" : "homogenous array of data used in explicit dimension arrays",
+                            "oneOf" : [ {
+                              "$comment" : "homogenous array of numbers",
+                              "type" : "array",
+                              "items" : {
+                                "type" : "number"
+                              }
+                            }, {
+                              "$comment" : "homogenous array of booleans",
+                              "type" : "array",
+                              "items" : {
+                                "type" : "boolean"
+                              }
+                            }, {
+                              "$comment" : "homogenous array of strings",
+                              "type" : "array",
+                              "items" : {
+                                "type" : "string"
+                              }
+                            } ]
+                          }, {
+                            "type" : "object",
+                            "properties" : {
+                              "type" : {
+                                "enum" : [ "linear", "logarithmic" ],
+                                "default" : "linear"
+                              },
+                              "start" : {
+                                "type" : "number",
+                                "default" : 1
+                              },
+                              "length" : {
+                                "type" : "number"
+                              },
+                              "incr" : {
+                                "type" : "number",
+                                "default" : 1
+                              }
+                            }
+                          } ]
+                        }
+                      }
+                    },
+                    "required" : [ "dimensions" ]
+                  }, {
+                    "oneOf" : [ {
+                      "properties" : {
+                        "measures" : {
+                          "type" : "array",
+                          "items" : {
+                            "$comment" : "homogenous array of data used in explicit measure arrays, may contain null values",
+                            "oneOf" : [ {
+                              "$comment" : "homogenous array of numbers, may contain null values",
+                              "type" : "array",
+                              "items" : {
+                                "anyOf" : [ {
+                                  "type" : "number"
+                                }, {
+                                  "type" : "null"
+                                } ]
+                              }
+                            }, {
+                              "$comment" : "homogenous array of booleans, may contain null values",
+                              "type" : "array",
+                              "items" : {
+                                "anyOf" : [ {
+                                  "type" : "boolean"
+                                }, {
+                                  "type" : "null"
+                                } ]
+                              }
+                            }, {
+                              "$comment" : "homogenous array of strings, may contain null values",
+                              "type" : "array",
+                              "items" : {
+                                "anyOf" : [ {
+                                  "type" : "string"
+                                }, {
+                                  "type" : "null"
+                                } ]
+                              }
+                            } ]
+                          }
+                        }
+                      },
+                      "required" : [ "measures" ]
+                    }, {
+                      "properties" : {
+                        "points" : {
+                          "type" : "array",
+                          "items" : {
+                            "$comment" : "heterogenous array of data used in point arrays",
+                            "type" : "array",
+                            "items" : {
+                              "oneOf" : [ {
+                                "type" : "number"
+                              }, {
+                                "type" : "boolean"
+                              }, {
+                                "type" : "string"
+                              }, {
+                                "type" : "null"
+                              } ]
+                            }
+                          }
+                        }
+                      },
+                      "required" : [ "points" ]
+                    } ]
+                  } ]
+                }
+              }
+            },
+            "reflectance spectrum data cube" : {
+              "$asm.property-class" : "http://purl.allotrope.org/ontologies/result#AFR_0002282",
+              "$asm.pattern" : "datacube",
+              "type" : "object",
+              "properties" : {
+                "label" : {
+                  "type" : "string"
+                },
+                "cube-structure" : {
+                  "type" : "object",
+                  "properties" : {
+                    "dimensions" : {
+                      "type" : "array",
+                      "items" : {
+                        "type" : "object",
+                        "properties" : {
+                          "@componentDatatype" : {
+                            "description" : "Subset of XSD datatypes supported in simple models",
+                            "default" : "double",
+                            "enum" : [ "double", "float", "decimal", "integer", "byte", "int", "short", "long", "string", "boolean", "dateTime" ]
+                          },
+                          "concept" : {
+                            "description" : "A class reference is the SKOS preferred label of a class. This label MUST be unique within the transitive closure of the vocabulary referenced by the manifest.",
+                            "type" : "string",
+                            "$asm.lookup-property" : "http://www.w3.org/2004/02/skos/core#prefLabel",
+                            "$asm.type" : "http://www.w3.org/2000/01/rdf-schema#Class"
+                          },
+                          "unit" : {
+                            "description" : "A unit is referenced by its QUDT symbol. It MUST be unique within the QUDT units defined in the vocabularies declared in the manifest.",
+                            "type" : "string",
+                            "$asm.lookup-property" : "http://purl.allotrope.org/ontology/qudt-ext/schema#symbol",
+                            "$asm.type" : "http://qudt.org/schema/qudt#Unit"
+                          },
+                          "scale" : {
+                            "enum" : [ "nominal", "ordinal", "cardinal", "interval", "range" ]
+                          },
+                          "$asm.fill-value" : {
+                            "type" : [ "string", "number", "integer", "boolean" ]
+                          }
+                        },
+                        "required" : [ "@componentDatatype", "concept" ],
+                        "allOf" : [ {
+                          "$comment" : "constraint on fill values if component data type is any numeric type",
+                          "if" : {
+                            "properties" : {
+                              "@componentDatatype" : {
+                                "pattern" : "double|float"
+                              }
+                            }
+                          },
+                          "then" : {
+                            "$asm.fill-value" : {
+                              "oneOf" : [ {
+                                "type" : "number"
+                              }, {
+                                "const" : "NaN"
+                              }, {
+                                "const" : "+Infinity"
+                              }, {
+                                "const" : "-Infinity"
+                              } ],
+                              "default" : 0.0
+                            }
+                          }
+                        }, {
+                          "$comment" : "constraint on fill values if component data type is any numeric type",
+                          "if" : {
+                            "properties" : {
+                              "@componentDatatype" : {
+                                "pattern" : "integer|decimal|long|int|short|byte"
+                              }
+                            }
+                          },
+                          "then" : {
+                            "$asm.fill-value" : {
+                              "type" : "number",
+                              "default" : 0
+                            }
+                          }
+                        }, {
+                          "$comment" : "constraint on fill values if component data type is boolean",
+                          "if" : {
+                            "properties" : {
+                              "@componentDatatype" : {
+                                "const" : "boolean"
+                              }
+                            }
+                          },
+                          "then" : {
+                            "$asm.fill-value" : {
+                              "type" : "boolean",
+                              "default" : false
+                            }
+                          }
+                        }, {
+                          "$comment" : "constraint on fill values if component data type is string",
+                          "if" : {
+                            "properties" : {
+                              "@componentDatatype" : {
+                                "pattern" : "string|dateTime|date"
+                              }
+                            }
+                          },
+                          "then" : {
+                            "$asm.fill-value" : {
+                              "type" : "string",
+                              "default" : ""
+                            }
+                          }
+                        } ]
+                      },
+                      "unique" : true,
+                      "minItems" : 1,
+                      "maxItems" : 1,
+                      "prefixItems" : [ {
+                        "properties" : {
+                          "concept" : {
+                            "const" : "wavelength"
+                          },
+                          "unit" : {
+                            "const" : "1/cm"
+                          },
+                          "@componentDatatype" : {
+                            "const" : "double"
+                          }
+                        }
+                      } ]
+                    },
+                    "measures" : {
+                      "type" : "array",
+                      "items" : {
+                        "type" : "object",
+                        "properties" : {
+                          "@componentDatatype" : {
+                            "description" : "Subset of XSD datatypes supported in simple models",
+                            "default" : "double",
+                            "enum" : [ "double", "float", "decimal", "integer", "byte", "int", "short", "long", "string", "boolean", "dateTime" ]
+                          },
+                          "concept" : {
+                            "description" : "A class reference is the SKOS preferred label of a class. This label MUST be unique within the transitive closure of the vocabulary referenced by the manifest.",
+                            "type" : "string",
+                            "$asm.lookup-property" : "http://www.w3.org/2004/02/skos/core#prefLabel",
+                            "$asm.type" : "http://www.w3.org/2000/01/rdf-schema#Class"
+                          },
+                          "unit" : {
+                            "description" : "A unit is referenced by its QUDT symbol. It MUST be unique within the QUDT units defined in the vocabularies declared in the manifest.",
+                            "type" : "string",
+                            "$asm.lookup-property" : "http://purl.allotrope.org/ontology/qudt-ext/schema#symbol",
+                            "$asm.type" : "http://qudt.org/schema/qudt#Unit"
+                          },
+                          "scale" : {
+                            "enum" : [ "nominal", "ordinal", "cardinal", "interval", "range" ]
+                          },
+                          "$asm.fill-value" : {
+                            "type" : [ "string", "number", "integer", "boolean" ]
+                          }
+                        },
+                        "required" : [ "@componentDatatype", "concept" ],
+                        "allOf" : [ {
+                          "$comment" : "constraint on fill values if component data type is any numeric type",
+                          "if" : {
+                            "properties" : {
+                              "@componentDatatype" : {
+                                "pattern" : "double|float"
+                              }
+                            }
+                          },
+                          "then" : {
+                            "$asm.fill-value" : {
+                              "oneOf" : [ {
+                                "type" : "number"
+                              }, {
+                                "const" : "NaN"
+                              }, {
+                                "const" : "+Infinity"
+                              }, {
+                                "const" : "-Infinity"
+                              } ],
+                              "default" : 0.0
+                            }
+                          }
+                        }, {
+                          "$comment" : "constraint on fill values if component data type is any numeric type",
+                          "if" : {
+                            "properties" : {
+                              "@componentDatatype" : {
+                                "pattern" : "integer|decimal|long|int|short|byte"
+                              }
+                            }
+                          },
+                          "then" : {
+                            "$asm.fill-value" : {
+                              "type" : "number",
+                              "default" : 0
+                            }
+                          }
+                        }, {
+                          "$comment" : "constraint on fill values if component data type is boolean",
+                          "if" : {
+                            "properties" : {
+                              "@componentDatatype" : {
+                                "const" : "boolean"
+                              }
+                            }
+                          },
+                          "then" : {
+                            "$asm.fill-value" : {
+                              "type" : "boolean",
+                              "default" : false
+                            }
+                          }
+                        }, {
+                          "$comment" : "constraint on fill values if component data type is string",
+                          "if" : {
+                            "properties" : {
+                              "@componentDatatype" : {
+                                "pattern" : "string|dateTime|date"
+                              }
+                            }
+                          },
+                          "then" : {
+                            "$asm.fill-value" : {
+                              "type" : "string",
+                              "default" : ""
+                            }
+                          }
+                        } ]
+                      },
+                      "unique" : true,
+                      "minItems" : 1,
+                      "maxItems" : 1,
+                      "contains" : {
+                        "oneOf" : [ {
+                          "properties" : {
+                            "concept" : {
+                              "const" : "reflectance"
+                            },
+                            "unit" : {
+                              "const" : "(unitless)"
+                            },
+                            "@componentDatatype" : {
+                              "const" : "double"
+                            }
+                          }
+                        } ]
+                      }
+                    }
+                  },
+                  "required" : [ "dimensions", "measures" ]
+                },
+                "data" : {
+                  "allOf" : [ {
+                    "properties" : {
+                      "dimensions" : {
+                        "type" : "array",
+                        "items" : {
+                          "oneOf" : [ {
+                            "$comment" : "homogenous array of data used in explicit dimension arrays",
+                            "oneOf" : [ {
+                              "$comment" : "homogenous array of numbers",
+                              "type" : "array",
+                              "items" : {
+                                "type" : "number"
+                              }
+                            }, {
+                              "$comment" : "homogenous array of booleans",
+                              "type" : "array",
+                              "items" : {
+                                "type" : "boolean"
+                              }
+                            }, {
+                              "$comment" : "homogenous array of strings",
+                              "type" : "array",
+                              "items" : {
+                                "type" : "string"
+                              }
+                            } ]
+                          }, {
+                            "type" : "object",
+                            "properties" : {
+                              "type" : {
+                                "enum" : [ "linear", "logarithmic" ],
+                                "default" : "linear"
+                              },
+                              "start" : {
+                                "type" : "number",
+                                "default" : 1
+                              },
+                              "length" : {
+                                "type" : "number"
+                              },
+                              "incr" : {
+                                "type" : "number",
+                                "default" : 1
+                              }
+                            }
+                          } ]
+                        }
+                      }
+                    },
+                    "required" : [ "dimensions" ]
+                  }, {
+                    "oneOf" : [ {
+                      "properties" : {
+                        "measures" : {
+                          "type" : "array",
+                          "items" : {
+                            "$comment" : "homogenous array of data used in explicit measure arrays, may contain null values",
+                            "oneOf" : [ {
+                              "$comment" : "homogenous array of numbers, may contain null values",
+                              "type" : "array",
+                              "items" : {
+                                "anyOf" : [ {
+                                  "type" : "number"
+                                }, {
+                                  "type" : "null"
+                                } ]
+                              }
+                            }, {
+                              "$comment" : "homogenous array of booleans, may contain null values",
+                              "type" : "array",
+                              "items" : {
+                                "anyOf" : [ {
+                                  "type" : "boolean"
+                                }, {
+                                  "type" : "null"
+                                } ]
+                              }
+                            }, {
+                              "$comment" : "homogenous array of strings, may contain null values",
+                              "type" : "array",
+                              "items" : {
+                                "anyOf" : [ {
+                                  "type" : "string"
+                                }, {
+                                  "type" : "null"
+                                } ]
+                              }
+                            } ]
+                          }
+                        }
+                      },
+                      "required" : [ "measures" ]
+                    }, {
+                      "properties" : {
+                        "points" : {
+                          "type" : "array",
+                          "items" : {
+                            "$comment" : "heterogenous array of data used in point arrays",
+                            "type" : "array",
+                            "items" : {
+                              "oneOf" : [ {
+                                "type" : "number"
+                              }, {
+                                "type" : "boolean"
+                              }, {
+                                "type" : "string"
+                              }, {
+                                "type" : "null"
+                              } ]
+                            }
+                          }
+                        }
+                      },
+                      "required" : [ "points" ]
+                    } ]
+                  } ]
+                }
+              }
+            },
+            "detector gain setting" : {
+              "$asm.property-class" : "http://purl.allotrope.org/ontologies/result#AFR_0002250",
+              "$asm.pattern" : "quantity datum",
+              "type" : "object",
+              "properties" : {
+                "value" : {
+                  "type" : "number"
+                },
+                "unit" : {
+                  "description" : "A unit is referenced by its QUDT symbol. It MUST be unique within the QUDT units defined in the vocabularies declared in the manifest.",
+                  "type" : "string",
+                  "$asm.lookup-property" : "http://purl.allotrope.org/ontology/qudt-ext/schema#symbol",
+                  "$asm.type" : "http://qudt.org/schema/qudt#Unit",
+                  "const" : "(unitless)",
+                  "$asm.unit-iri" : "http://purl.allotrope.org/ontology/qudt-ext/unit#Unitless"
+                },
+                "@type" : {
+                  "description" : "A class reference is the SKOS preferred label of a class. This label MUST be unique within the transitive closure of the vocabulary referenced by the manifest.",
+                  "type" : "string",
+                  "$asm.lookup-property" : "http://www.w3.org/2004/02/skos/core#prefLabel",
+                  "$asm.type" : "http://www.w3.org/2000/01/rdf-schema#Class"
+                }
+              },
+              "$asm.type" : "http://qudt.org/schema/qudt#QuantityValue",
+              "required" : [ "value", "unit" ]
+            },
+            "absorption spectrum data cube" : {
+              "$asm.property-class" : "http://purl.allotrope.org/ontologies/result#AFR_0002283",
+              "$asm.pattern" : "datacube",
+              "type" : "object",
+              "properties" : {
+                "label" : {
+                  "type" : "string"
+                },
+                "cube-structure" : {
+                  "type" : "object",
+                  "properties" : {
+                    "dimensions" : {
+                      "type" : "array",
+                      "items" : {
+                        "type" : "object",
+                        "properties" : {
+                          "@componentDatatype" : {
+                            "description" : "Subset of XSD datatypes supported in simple models",
+                            "default" : "double",
+                            "enum" : [ "double", "float", "decimal", "integer", "byte", "int", "short", "long", "string", "boolean", "dateTime" ]
+                          },
+                          "concept" : {
+                            "description" : "A class reference is the SKOS preferred label of a class. This label MUST be unique within the transitive closure of the vocabulary referenced by the manifest.",
+                            "type" : "string",
+                            "$asm.lookup-property" : "http://www.w3.org/2004/02/skos/core#prefLabel",
+                            "$asm.type" : "http://www.w3.org/2000/01/rdf-schema#Class"
+                          },
+                          "unit" : {
+                            "description" : "A unit is referenced by its QUDT symbol. It MUST be unique within the QUDT units defined in the vocabularies declared in the manifest.",
+                            "type" : "string",
+                            "$asm.lookup-property" : "http://purl.allotrope.org/ontology/qudt-ext/schema#symbol",
+                            "$asm.type" : "http://qudt.org/schema/qudt#Unit"
+                          },
+                          "scale" : {
+                            "enum" : [ "nominal", "ordinal", "cardinal", "interval", "range" ]
+                          },
+                          "$asm.fill-value" : {
+                            "type" : [ "string", "number", "integer", "boolean" ]
+                          }
+                        },
+                        "required" : [ "@componentDatatype", "concept" ],
+                        "allOf" : [ {
+                          "$comment" : "constraint on fill values if component data type is any numeric type",
+                          "if" : {
+                            "properties" : {
+                              "@componentDatatype" : {
+                                "pattern" : "double|float"
+                              }
+                            }
+                          },
+                          "then" : {
+                            "$asm.fill-value" : {
+                              "oneOf" : [ {
+                                "type" : "number"
+                              }, {
+                                "const" : "NaN"
+                              }, {
+                                "const" : "+Infinity"
+                              }, {
+                                "const" : "-Infinity"
+                              } ],
+                              "default" : 0.0
+                            }
+                          }
+                        }, {
+                          "$comment" : "constraint on fill values if component data type is any numeric type",
+                          "if" : {
+                            "properties" : {
+                              "@componentDatatype" : {
+                                "pattern" : "integer|decimal|long|int|short|byte"
+                              }
+                            }
+                          },
+                          "then" : {
+                            "$asm.fill-value" : {
+                              "type" : "number",
+                              "default" : 0
+                            }
+                          }
+                        }, {
+                          "$comment" : "constraint on fill values if component data type is boolean",
+                          "if" : {
+                            "properties" : {
+                              "@componentDatatype" : {
+                                "const" : "boolean"
+                              }
+                            }
+                          },
+                          "then" : {
+                            "$asm.fill-value" : {
+                              "type" : "boolean",
+                              "default" : false
+                            }
+                          }
+                        }, {
+                          "$comment" : "constraint on fill values if component data type is string",
+                          "if" : {
+                            "properties" : {
+                              "@componentDatatype" : {
+                                "pattern" : "string|dateTime|date"
+                              }
+                            }
+                          },
+                          "then" : {
+                            "$asm.fill-value" : {
+                              "type" : "string",
+                              "default" : ""
+                            }
+                          }
+                        } ]
+                      },
+                      "unique" : true,
+                      "minItems" : 1,
+                      "maxItems" : 1,
+                      "prefixItems" : [ {
+                        "properties" : {
+                          "concept" : {
+                            "const" : "wavelength"
+                          },
+                          "unit" : {
+                            "const" : "1/cm"
+                          },
+                          "@componentDatatype" : {
+                            "const" : "double"
+                          }
+                        }
+                      } ]
+                    },
+                    "measures" : {
+                      "type" : "array",
+                      "items" : {
+                        "type" : "object",
+                        "properties" : {
+                          "@componentDatatype" : {
+                            "description" : "Subset of XSD datatypes supported in simple models",
+                            "default" : "double",
+                            "enum" : [ "double", "float", "decimal", "integer", "byte", "int", "short", "long", "string", "boolean", "dateTime" ]
+                          },
+                          "concept" : {
+                            "description" : "A class reference is the SKOS preferred label of a class. This label MUST be unique within the transitive closure of the vocabulary referenced by the manifest.",
+                            "type" : "string",
+                            "$asm.lookup-property" : "http://www.w3.org/2004/02/skos/core#prefLabel",
+                            "$asm.type" : "http://www.w3.org/2000/01/rdf-schema#Class"
+                          },
+                          "unit" : {
+                            "description" : "A unit is referenced by its QUDT symbol. It MUST be unique within the QUDT units defined in the vocabularies declared in the manifest.",
+                            "type" : "string",
+                            "$asm.lookup-property" : "http://purl.allotrope.org/ontology/qudt-ext/schema#symbol",
+                            "$asm.type" : "http://qudt.org/schema/qudt#Unit"
+                          },
+                          "scale" : {
+                            "enum" : [ "nominal", "ordinal", "cardinal", "interval", "range" ]
+                          },
+                          "$asm.fill-value" : {
+                            "type" : [ "string", "number", "integer", "boolean" ]
+                          }
+                        },
+                        "required" : [ "@componentDatatype", "concept" ],
+                        "allOf" : [ {
+                          "$comment" : "constraint on fill values if component data type is any numeric type",
+                          "if" : {
+                            "properties" : {
+                              "@componentDatatype" : {
+                                "pattern" : "double|float"
+                              }
+                            }
+                          },
+                          "then" : {
+                            "$asm.fill-value" : {
+                              "oneOf" : [ {
+                                "type" : "number"
+                              }, {
+                                "const" : "NaN"
+                              }, {
+                                "const" : "+Infinity"
+                              }, {
+                                "const" : "-Infinity"
+                              } ],
+                              "default" : 0.0
+                            }
+                          }
+                        }, {
+                          "$comment" : "constraint on fill values if component data type is any numeric type",
+                          "if" : {
+                            "properties" : {
+                              "@componentDatatype" : {
+                                "pattern" : "integer|decimal|long|int|short|byte"
+                              }
+                            }
+                          },
+                          "then" : {
+                            "$asm.fill-value" : {
+                              "type" : "number",
+                              "default" : 0
+                            }
+                          }
+                        }, {
+                          "$comment" : "constraint on fill values if component data type is boolean",
+                          "if" : {
+                            "properties" : {
+                              "@componentDatatype" : {
+                                "const" : "boolean"
+                              }
+                            }
+                          },
+                          "then" : {
+                            "$asm.fill-value" : {
+                              "type" : "boolean",
+                              "default" : false
+                            }
+                          }
+                        }, {
+                          "$comment" : "constraint on fill values if component data type is string",
+                          "if" : {
+                            "properties" : {
+                              "@componentDatatype" : {
+                                "pattern" : "string|dateTime|date"
+                              }
+                            }
+                          },
+                          "then" : {
+                            "$asm.fill-value" : {
+                              "type" : "string",
+                              "default" : ""
+                            }
+                          }
+                        } ]
+                      },
+                      "unique" : true,
+                      "minItems" : 1,
+                      "maxItems" : 1,
+                      "contains" : {
+                        "oneOf" : [ {
+                          "properties" : {
+                            "concept" : {
+                              "const" : "absorbance"
+                            },
+                            "unit" : {
+                              "const" : "AU"
+                            },
+                            "@componentDatatype" : {
+                              "const" : "double"
+                            }
+                          }
+                        } ]
+                      }
+                    }
+                  },
+                  "required" : [ "dimensions", "measures" ]
+                },
+                "data" : {
+                  "allOf" : [ {
+                    "properties" : {
+                      "dimensions" : {
+                        "type" : "array",
+                        "items" : {
+                          "oneOf" : [ {
+                            "$comment" : "homogenous array of data used in explicit dimension arrays",
+                            "oneOf" : [ {
+                              "$comment" : "homogenous array of numbers",
+                              "type" : "array",
+                              "items" : {
+                                "type" : "number"
+                              }
+                            }, {
+                              "$comment" : "homogenous array of booleans",
+                              "type" : "array",
+                              "items" : {
+                                "type" : "boolean"
+                              }
+                            }, {
+                              "$comment" : "homogenous array of strings",
+                              "type" : "array",
+                              "items" : {
+                                "type" : "string"
+                              }
+                            } ]
+                          }, {
+                            "type" : "object",
+                            "properties" : {
+                              "type" : {
+                                "enum" : [ "linear", "logarithmic" ],
+                                "default" : "linear"
+                              },
+                              "start" : {
+                                "type" : "number",
+                                "default" : 1
+                              },
+                              "length" : {
+                                "type" : "number"
+                              },
+                              "incr" : {
+                                "type" : "number",
+                                "default" : 1
+                              }
+                            }
+                          } ]
+                        }
+                      }
+                    },
+                    "required" : [ "dimensions" ]
+                  }, {
+                    "oneOf" : [ {
+                      "properties" : {
+                        "measures" : {
+                          "type" : "array",
+                          "items" : {
+                            "$comment" : "homogenous array of data used in explicit measure arrays, may contain null values",
+                            "oneOf" : [ {
+                              "$comment" : "homogenous array of numbers, may contain null values",
+                              "type" : "array",
+                              "items" : {
+                                "anyOf" : [ {
+                                  "type" : "number"
+                                }, {
+                                  "type" : "null"
+                                } ]
+                              }
+                            }, {
+                              "$comment" : "homogenous array of booleans, may contain null values",
+                              "type" : "array",
+                              "items" : {
+                                "anyOf" : [ {
+                                  "type" : "boolean"
+                                }, {
+                                  "type" : "null"
+                                } ]
+                              }
+                            }, {
+                              "$comment" : "homogenous array of strings, may contain null values",
+                              "type" : "array",
+                              "items" : {
+                                "anyOf" : [ {
+                                  "type" : "string"
+                                }, {
+                                  "type" : "null"
+                                } ]
+                              }
+                            } ]
+                          }
+                        }
+                      },
+                      "required" : [ "measures" ]
+                    }, {
+                      "properties" : {
+                        "points" : {
+                          "type" : "array",
+                          "items" : {
+                            "$comment" : "heterogenous array of data used in point arrays",
+                            "type" : "array",
+                            "items" : {
+                              "oneOf" : [ {
+                                "type" : "number"
+                              }, {
+                                "type" : "boolean"
+                              }, {
+                                "type" : "string"
+                              }, {
+                                "type" : "null"
+                              } ]
+                            }
+                          }
+                        }
+                      },
+                      "required" : [ "points" ]
+                    } ]
+                  } ]
+                }
+              }
+            },
+            "aperture size setting" : {
+              "$asm.property-class" : "http://purl.allotrope.org/ontologies/result#AFR_0002389",
+              "$asm.pattern" : "quantity datum",
+              "type" : "object",
+              "properties" : {
+                "value" : {
+                  "type" : "number"
+                },
+                "unit" : {
+                  "description" : "A unit is referenced by its QUDT symbol. It MUST be unique within the QUDT units defined in the vocabularies declared in the manifest.",
+                  "type" : "string",
+                  "$asm.lookup-property" : "http://purl.allotrope.org/ontology/qudt-ext/schema#symbol",
+                  "$asm.type" : "http://qudt.org/schema/qudt#Unit",
+                  "const" : "nm",
+                  "$asm.unit-iri" : "http://purl.allotrope.org/ontology/qudt-ext/unit#Nanometer"
+                },
+                "@type" : {
+                  "description" : "A class reference is the SKOS preferred label of a class. This label MUST be unique within the transitive closure of the vocabulary referenced by the manifest.",
+                  "type" : "string",
+                  "$asm.lookup-property" : "http://www.w3.org/2004/02/skos/core#prefLabel",
+                  "$asm.type" : "http://www.w3.org/2000/01/rdf-schema#Class"
+                }
+              },
+              "$asm.type" : "http://qudt.org/schema/qudt#QuantityValue",
+              "required" : [ "value", "unit" ]
+            }
+          }
+        }
+      }
+    },
+    "conformance assessment" : {
+      "$asm.property-class" : "http://purl.allotrope.org/ontologies/result#AFR_0001991",
+      "$asm.pattern" : "value datum",
+      "$asm.type" : "http://www.w3.org/2001/XMLSchema#boolean",
+      "oneOf" : [ {
+        "type" : "boolean"
+      }, {
+        "type" : "object",
+        "required" : [ "@type", "value" ],
+        "properties" : {
+          "value" : {
+            "type" : "boolean"
+          },
+          "@type" : {
+            "type" : "string",
+            "$asm.type" : "http://www.w3.org/2000/01/rdf-schema#Class",
+            "$asm.lookup-property" : "http://www.w3.org/2004/02/skos/core#prefLabel"
+          }
+        }
+      } ]
+    },
+    "material identifier" : {
+      "$asm.property-class" : "http://purl.allotrope.org/ontologies/result#AFR_0001745",
+      "$asm.pattern" : "value datum",
+      "$asm.type" : "http://www.w3.org/2001/XMLSchema#string",
+      "oneOf" : [ {
+        "type" : "string"
+      }, {
+        "type" : "object",
+        "required" : [ "@type", "value" ],
+        "properties" : {
+          "value" : {
+            "type" : "string"
+          },
+          "@type" : {
+            "type" : "string",
+            "$asm.type" : "http://www.w3.org/2000/01/rdf-schema#Class",
+            "$asm.lookup-property" : "http://www.w3.org/2004/02/skos/core#prefLabel"
+          }
+        }
+      } ]
+    },
+    "detector type" : {
+      "$asm.property-class" : "http://purl.allotrope.org/ontologies/result#AFR_0002253",
+      "$asm.pattern" : "value datum",
+      "$asm.type" : "http://www.w3.org/2001/XMLSchema#string",
+      "oneOf" : [ {
+        "type" : "string"
+      }, {
+        "type" : "object",
+        "required" : [ "@type", "value" ],
+        "properties" : {
+          "value" : {
+            "type" : "string"
+          },
+          "@type" : {
+            "type" : "string",
+            "$asm.type" : "http://www.w3.org/2000/01/rdf-schema#Class",
+            "$asm.lookup-property" : "http://www.w3.org/2004/02/skos/core#prefLabel"
+          }
+        }
+      } ]
+    },
+    "batch identifier" : {
+      "$asm.property-class" : "http://purl.allotrope.org/ontologies/result#AFR_0001120",
+      "$asm.pattern" : "value datum",
+      "$asm.type" : "http://www.w3.org/2001/XMLSchema#string",
+      "oneOf" : [ {
+        "type" : "string"
+      }, {
+        "type" : "object",
+        "required" : [ "@type", "value" ],
+        "properties" : {
+          "value" : {
+            "type" : "string"
+          },
+          "@type" : {
+            "type" : "string",
+            "$asm.type" : "http://www.w3.org/2000/01/rdf-schema#Class",
+            "$asm.lookup-property" : "http://www.w3.org/2004/02/skos/core#prefLabel"
+          }
+        }
+      } ]
+    },
+    "analyst" : {
+      "$asm.property-class" : "http://purl.allotrope.org/ontologies/result#AFR_0001116",
+      "$asm.pattern" : "value datum",
+      "$asm.type" : "http://www.w3.org/2001/XMLSchema#string",
+      "oneOf" : [ {
+        "type" : "string"
+      }, {
+        "type" : "object",
+        "required" : [ "@type", "value" ],
+        "properties" : {
+          "value" : {
+            "type" : "string"
+          },
+          "@type" : {
+            "type" : "string",
+            "$asm.type" : "http://www.w3.org/2000/01/rdf-schema#Class",
+            "$asm.lookup-property" : "http://www.w3.org/2004/02/skos/core#prefLabel"
+          }
+        }
+      } ]
+    }
+  }
+}

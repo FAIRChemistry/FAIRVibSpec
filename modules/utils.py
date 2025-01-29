@@ -15,6 +15,10 @@ from scipy.signal import find_peaks, peak_widths
 from scipy.stats import cauchy, norm
 
 
+MANIFEST_REGEX = re.compile(
+    r"^https?://purl\.allotrope\.org/manifests/ftir/REC/\d{4}/\d{2}/ftir\.manifest$"
+)
+
 
 def _dataframe_truncate(dataframe: pd.DataFrame, wavenumber_region) -> pd.DataFrame:
     """
@@ -196,3 +200,57 @@ def _value_to_string(value: "Value") -> str:
         significant_decimals = 3
         significant_value = round(value.value, significant_decimals)
         return f"${significant_value}$"
+
+
+def serialize_model_with_manifest(
+    model: BaseModel, filepath: PathLike[str], manifest_url: str = None
+) -> None:
+    """Serialize an FTIR model to an Allotrope Simple Model (ASM)
+    compliant JSON file with the URL pointing to the current manifest
+    file.
+
+    Args:
+        model (BaseModel): Pydantic-based FTIR model
+        filepath (PathLike[str]): Path to the output JSON file
+        manifest_url (str, optional): URL to the manifest file. Defaults to None.
+
+    Raises:
+        ValueError: If the manifest URL does not match the expected format
+    """
+    # Handle default manifest URL. Should be kept updated to the latest
+    # version
+    if manifest_url is None:
+        manifest_url = (
+            "http://purl.allotrope.org/manifests/ftir/REC/2021/12/ftir.manifest"
+        )
+
+    # Validate manifest URL format using regex
+    if not MANIFEST_REGEX.match(manifest_url):
+        raise ValueError(
+            f"Invalid manifest URL format: {manifest_url}. "
+            "Expected format: 'http://purl.allotrope.org/manifests/ftir/REC/YYYY/MM/ftir.manifest'"
+        )
+
+    # Serialize FTIR model to ASM JSON file
+    try:
+        manifest_entry = {"$asm.manifest": manifest_url}
+        output_data = {
+            **manifest_entry,
+            **model.model_dump(
+                exclude={
+                    "FieldComponentDatatype",
+                    "Dimension.field_componentDatatype",
+                    "Measure.field_componentDatatype",
+                },
+                exclude_unset=True,
+                exclude_none=True,
+                by_alias=True,
+            ),
+        }
+
+        with open(filepath, "w") as f:
+            json.dump(output_data, f, indent=2)
+
+    except Exception as e:
+        print(f"Failed to serialize model: {e}")
+        raise

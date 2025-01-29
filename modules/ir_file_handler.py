@@ -16,6 +16,9 @@ import pandas as pd
 from astropy import units as u
 from mdmodels import DataModel
 
+from .utils import serialize_model_with_manifest
+from .mapper import map_to_ftir_asm
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
@@ -294,3 +297,32 @@ class IRDataFiles:
         else:
             # if no measurement_no is given, the parameters are saved for the experiment instead
             self._datamodel.experiment.static_parameters = sample_object
+
+    def to_allotrope(
+        self, out_dir: os.PathLike[str] = None, manifest_url: str = None
+    ) -> None:
+        """Serialize the IR research data model to the FTIR Allotrope
+        Simple Model (ASM).
+
+        Args:
+            filepath (PathLike[str], optional): The file path to save the JSON output.
+            manifest_url (str, optional): _description_. Defaults to None.
+        """
+
+        # Handle default output directory
+        if not out_dir:
+            out_dir = Path(__file__).parent.parent / "data"
+        out_dir.mkdir(parents=True, exist_ok=True)
+
+        # Map the IR research data model to the FTIR ASM
+        ftir_asm = map_to_ftir_asm(self.datamodel)
+
+        for index, asm in enumerate(ftir_asm):
+            # Serialize the ASM to JSON file
+            serialize_model_with_manifest(
+                model=asm,
+                filepath=f"{out_dir}/ftir_{index}.json",
+                manifest_url=manifest_url,
+            )
+
+        print("Serialization to Allotrope FTIR JSON successful! Yay! 🎉")
