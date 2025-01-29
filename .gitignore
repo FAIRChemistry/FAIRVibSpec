@@ -128,8 +128,8 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-# sample data
-IR_sample_data/
+# Folder for generated data
+data/
 
-# VS code config
-.vscode
+# Folder for temporary files
+tmp/

@@ -2,19 +2,17 @@
 
 Python object model specifications based on the sdRDM Python library.
 
-
 ## Core objects
-
 
 ### IRAnalysis
 
 Most meta object of your data model with some examples of sensible fields.
 
 - __datetime_created__
-  - Type: datetime
+  - Type: string
   - Description: Date and time this dataset has been created.
 - datetime_modified
-  - Type: datetime
+  - Type: string
   - Description: Date and time this dataset has last been modified.
 - contributors
   - Type: string[]
@@ -46,8 +44,6 @@ This could be a very basic object that keeps track of the entire experiment.
   - Type: Result
   - Description: List of final results calculated from measurements done for the experiment.
 
-
-
 ### Parameters
 
 This object keeps track of important synthesis and measurement parameters.
@@ -67,9 +63,9 @@ This object keeps track of important synthesis and measurement parameters.
 - probe_molecule
   - Type: string
   - Description: Probe molecule used
-- sample_preperation
+- sample_preparation
   - Type: string
-  - Description: Addidional description of preperation parameters.
+  - Description: Addidional description of preparation parameters.
 - measurement_temperature
   - Type: Value
   - Description: Temperature during the measurement.
@@ -90,6 +86,9 @@ This object keeps track of important synthesis and measurement parameters.
 
 Contains one measurement done for the experiment. E.g. sample, unloaded sample and background.
 
+- __id__
+  - Type: Identifier
+  - Description: Unique identifier for the single measurement.
 - __name__
   - Type: string
   - Description: Descriptive name for the single measurement.
@@ -132,7 +131,6 @@ Contains all steps and parameters used to manipulate data and to calculate resul
   - Type: Result[]
   - Description: List of final results calculated from one measurement.
 
-
 ### Band
 
 Contains parameters of a band analyzed during the analysis.
@@ -155,7 +153,6 @@ Contains parameters of a band analyzed during the analysis.
 - extinction_coefficient
   - Type: Value
   - Description: Molar extinction coefficient of the band.
-
 
 ### Fit
 
@@ -190,7 +187,7 @@ A final result obtained from the analysis.
 Container for a single set of data.
 
 - timestamp
-  - Type: datetime
+  - Type: string
   - Description: Date and time the data was recorded
 - x_axis
   - Type: Series
@@ -199,9 +196,7 @@ Container for a single set of data.
   - Type: Series
   - Description: The object containing data points and unit of the y-axis.
 
-
 ## Utility objects
-
 
 ### Series
 
@@ -211,9 +206,8 @@ Abstract Container for a measured Series (i.e. one axis).
   - Type: float[]
   - Description: List of data points of one measured Series.
 - unit
-  - Type: Unit
+  - Type: UnitDefinition
   - Description: Unit of the data points contained in `data_array`.
-
 
 ### Value
 
@@ -223,7 +217,7 @@ Abstract Container for a single value-unit pair.
   - Type: float
   - Description: Value of the data point
 - __unit__
-  - Type: Unit
+  - Type: UnitDefinition
   - Description: Unit of the data point contained in `value`.
 - error
   - Type: float
@@ -232,9 +226,7 @@ Abstract Container for a single value-unit pair.
   - Type: float
   - Description: If the error is not symetric in both directions, this value specifies the error into the other direction.
 
-
 ## Enumerations
-
 
 ### MeasurementTypes
 
