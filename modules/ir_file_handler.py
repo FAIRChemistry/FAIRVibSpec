@@ -3,17 +3,20 @@ This module contains classes and functions to collect IR data files and
 to assign them a role for later analysis.
 """
 
-from types import NoneType
-from anyio import value
-from sdRDM import DataModel
-from datamodel.core import IRAnalysis, Experiment, Series, Dataset, Parameters, Value
-import os, glob
+import glob
+import os
 from datetime import datetime
-from typing import List, Optional, Union
+from pathlib import Path
+from types import NoneType
+from typing import List, Optional
+
 import matplotlib.pyplot as plt
-import pandas as pd
 import numpy as np
+import pandas as pd
 from astropy import units as u
+from mdmodels import DataModel
+
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 class IRDataFiles:
@@ -23,10 +26,12 @@ class IRDataFiles:
     """
 
     def __init__(self, **kwargs):
-        self.contributors = kwargs.get("contributors", "")
-        self.directory = kwargs.get("file_directory", "./")
         self.kwargs = kwargs
-        self.datamodel_directory = kwargs.get("datamodel_directory", "./datamodel/core")
+        self.contributors = kwargs.get("contributors", "")
+        self.directory = kwargs.get("file_directory")
+        self.dm_markdown_definition = kwargs.get(
+            "dm_markdown_definition", BASE_DIR / "specifications/iranalysis.md"
+        )
         self.detection = kwargs.get("detection", "absorbance")
         self.varied_parameter = kwargs.get("varied_parameter", "measurement_no")
         self.varied_parameter_values = kwargs.get("varied_parameter_values", [])
@@ -38,10 +43,23 @@ class IRDataFiles:
         self.decimal_separator = kwargs.get("decimal", ",")
         self.file_extension = kwargs.get("extension", "csv")
         self._loaded_ir_files = self._load_files()
-        self.datetime_created = str(datetime.now())
         self.experiment_name = kwargs.get("experiment_name", "UnspecifiedExperiment")
         self._background_df = pd.DataFrame({"wavenumber": [], "intensity": []})
+        self._library = self._generate_library()
         self._datamodel = self._initialize_datamodel()
+
+    @property
+    def library(self):
+        return self._library
+
+    @library.setter
+    def library(self, library: DataModel):
+        if isinstance(library, DataModel):
+            self._library = library
+
+    def _generate_library(self):
+        self._library = DataModel.from_markdown(self.dm_markdown_definition)
+        return self._library
 
     @property
     def files(self) -> List[str]:
@@ -62,7 +80,7 @@ class IRDataFiles:
     def _load_files(self):
         """Function to load all files from the specified directory and save them
         in the _loaded_ir_files attribute."""
-        directory = os.path.abspath(self.directory) # Absolute path to the directory
+        directory = os.path.abspath(self.directory)  # Absolute path to the directory
         return glob.glob(f"{directory}/*.{self.file_extension}")
 
     def show_raw_data(self, wavenumber_region=None, legend: bool = False):
@@ -75,14 +93,15 @@ class IRDataFiles:
             legend (bool, optional): Wheter to show a legend containing
                 the corresponding filenames. Default is False.
         """
-    
+
         fig, ax = plt.subplots()
         # Iterating over all measurements in the DataModel
         for measurement_object in self.datamodel.experiment.measurements:
             wavenumber = measurement_object.measurement_data.x_axis.data_array
             intensity = measurement_object.measurement_data.y_axis.data_array
-            spectrum_df = pd.DataFrame({"wavenumber": wavenumber, 
-                                        "intensity": intensity})
+            spectrum_df = pd.DataFrame(
+                {"wavenumber": wavenumber, "intensity": intensity}
+            )
             # truncating spectrum to desired region
             if not isinstance(wavenumber_region, NoneType):
                 wavenumber_region = np.array(wavenumber_region)
@@ -91,8 +110,11 @@ class IRDataFiles:
                     & (spectrum_df["wavenumber"] > wavenumber_region.min())
                 ]
                 plt.xlim(wavenumber_region)
-            ax.plot(spectrum_df["wavenumber"], spectrum_df["intensity"], 
-                    label=measurement_object.name)
+            ax.plot(
+                spectrum_df["wavenumber"],
+                spectrum_df["intensity"],
+                label=measurement_object.name,
+            )
         ax.set_xlabel("wavenumber / cm$^{-1}$")
         ax.set_ylabel(f"{self.detection} / a.u.")
         if legend:
@@ -103,11 +125,7 @@ class IRDataFiles:
 
     @property
     def datamodel(self):
-        if self._datamodel == None:
-            self._initialize_datamodel()
-            return self._datamodel
-        else:
-            return self._datamodel
+        return self._datamodel
 
     @datamodel.setter
     def datamodel(self, datamodel):
@@ -115,22 +133,22 @@ class IRDataFiles:
             self._datamodel = datamodel
 
     def _initialize_datamodel(self) -> DataModel:
-        """Function to generate new DataModel on basis of raw measurement
-            data from files.
+        """Generate a new instance of `DataModel` based on the
+        `iranalysis.md` markdown document, using the parsed data files.
 
         Returns:
-            datamodel_root (DataModel): With added Measurement objects
+            datamodel_root (DataModel): A new instance of `DataModel`
         """
 
         # Creating an root instance of the DataModel
-        datamodel_root = IRAnalysis(
-            datetime_created=str(self.datetime_created),
+        datamodel_root = self.library.IRAnalysis(
+            datetime_created=datetime.now().strftime("%Y-%m-%dT%H:%M:%S"),
         )
         # Creating an Experiment instance of the DataModel
-        datamodel_root_experiment = Experiment(name=self.experiment_name,
-                                               varied_parameter=self.varied_parameter,
-    
-                                     )
+        datamodel_root_experiment = self.library.Experiment(
+            name=self.experiment_name,
+            varied_parameter=self.varied_parameter,
+        )
         # Counter for the measurement number
         n = 0
         # Instead of providing data files, data can also be provided as a list of DataFrames
@@ -147,34 +165,43 @@ class IRDataFiles:
                     names=self.column_sequence,
                     header=self.header,
                 )
-                name = file_location.split("\\")[-1].split(f".{self.file_extension}")[0]
+                name = Path(file_location).stem
             # Creating individual Series and Dataset instance and fill
             # with spectral data
-            wavenumber_series = Series(
+            wavenumber_series = self.library.Series(
                 data_array=spectrum_df["wavenumber"].to_numpy(), unit="1 / cm"
             )
-            intensity_series = Series(
+            intensity_series = self.library.Series(
                 data_array=spectrum_df["intensity"].to_numpy(),
                 unit="dimensionless",
             )
-            dataset = Dataset(x_axis=wavenumber_series, y_axis=intensity_series)
-            
+            dataset = self.library.Dataset(
+                x_axis=wavenumber_series, y_axis=intensity_series
+            )
+
             # determining the varied parameter value for the measurement
             try:
                 varied_parameter_value = self.varied_parameter_values[n]
             except:
-                print("Not enough values for the varied parameter provided. Using measurement number.")
+                print(
+                    "Not enough values for the varied parameter provided. Using measurement number."
+                )
                 varied_parameter_value = str(n)
             n += 1
             # Turning varied parameter value into an astropy Quantity
             varied_parameter_value = u.Quantity(varied_parameter_value)
             # Adding a Measurement instance to the Experiment
-            datamodel_root_experiment.add_to_measurements(
-                name=name, 
-                measurement_data=dataset,
-                varied_parameter_value=Value(value=varied_parameter_value.value, 
-                                             unit=f"{varied_parameter_value.unit}"),
-                detection=self.detection,
+            datamodel_root_experiment.measurements.append(
+                self.library.Measurement(
+                    id=str(n - 1),
+                    name=name,
+                    measurement_data=dataset,
+                    varied_parameter_value=self.library.Value(
+                        value=varied_parameter_value.value,
+                        unit=f"{varied_parameter_value.unit}",
+                    ),
+                    detection=self.detection,
+                )
             )
         datamodel_root.experiment = datamodel_root_experiment
         self._datamodel = datamodel_root
@@ -196,12 +223,13 @@ class IRDataFiles:
                 measurement
         """
         # Initialize DataModel if not already initialized
-        if self._datamodel == None:
+        if self._datamodel is None:
             self._initialize_datamodel()
-        
+
         # Lower casing all names in the list for campatibility
         background_spectra = [spectrum.lower() for spectrum in background_spectra]
-        measurements = self._datamodel.experiment.measurements  # type: ignore
+        print(f"Measurements: {self.datamodel.experiment}")
+        measurements = self.datamodel.experiment.measurements  # type: ignore
         for spectrum in measurements:
             if spectrum.name in background_spectra:
                 spectrum.measurement_type = "background"
@@ -228,8 +256,10 @@ class IRDataFiles:
         }
         self._background_df = pd.DataFrame(background_df_data)
         return self._background_df
-    
-    def fill_static_parameters(self, parameters_dict: dict, measurement_no: Optional[int] = None):
+
+    def fill_static_parameters(
+        self, parameters_dict: dict, measurement_no: Optional[int] = None
+    ):
         """Fills Parameters object in the DataModel with data
         provided in parameters_dict.
 
@@ -239,8 +269,8 @@ class IRDataFiles:
                 parameters will be saved for the measurement instead of the whole experiment.
         """
         # all available Fields of Parameters except ID
-        available = list(Parameters.model_fields.keys())[1:]
-        sample_object = Parameters()
+        available = list(self.library.Parameters.model_fields.keys())[1:]
+        sample_object = self.library.Parameters()
         for attribute in parameters_dict:
             if attribute in available:
                 # Checking whether a Value object is expected for the given attribute
@@ -249,14 +279,18 @@ class IRDataFiles:
                     == "Value"
                 ):
                     quantity = u.Quantity(parameters_dict[attribute])
-                    value_object = Value(value=quantity.value, unit=f"{quantity.unit}")
+                    value_object = self.library.Value(
+                        value=quantity.value, unit=f"{quantity.unit}"
+                    )
                     setattr(sample_object, attribute, value_object)
                 else:
                     setattr(sample_object, attribute, parameters_dict[attribute])
             else:
                 print(f"{attribute} is an unknown field.")
         if isinstance(measurement_no, int):
-            self._datamodel.experiment.measurements[measurement_no].static_parameters = sample_object
+            self._datamodel.experiment.measurements[
+                measurement_no
+            ].static_parameters = sample_object
         else:
-            #if no measurement_no is given, the parameters are saved for the experiment instead
+            # if no measurement_no is given, the parameters are saved for the experiment instead
             self._datamodel.experiment.static_parameters = sample_object
