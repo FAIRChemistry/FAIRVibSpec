@@ -218,7 +218,7 @@ Parameters extracted from the SIF file of the Raman spectrometer used for the me
   - Type: integer[]
   - Description: Size of the data array.
 - tile
-  - Type: bytes
+  - Type: string
   - Description: Tiling information for the dataset.
 - offset
   - Type: integer

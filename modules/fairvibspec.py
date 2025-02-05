@@ -599,7 +599,7 @@ class SIFParameters(BaseModel):
     ybin: Optional[int] = Field(default=None)
     timestamp_of_0: Optional[int] = Field(default=None)
     size: list[int] = Field(default_factory=list)
-    tile: Optional[bytes] = Field(default=None)
+    tile: Optional[str] = Field(default=None)
     offset: Optional[int] = Field(default=None)
 
     # JSON-LD fields
