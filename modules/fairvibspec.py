@@ -67,13 +67,13 @@ def validate_prefix(term: str | dict, prefix: str):
 
 # Model Definitions
 
-class IRAnalysis(BaseModel):
+class FAIRVibSpec(BaseModel):
 
     model_config: ConfigDict = ConfigDict( # type: ignore
         validate_assigment = True,
     ) # type: ignore
 
-    datetime_created: str
+    datetime_created: Optional[str] = Field(default=None)
     datetime_modified: Optional[str] = Field(default=None)
     contributors: list[str] = Field(default_factory=list)
     experiment: Optional[Experiment] = Field(default=None)
@@ -81,12 +81,12 @@ class IRAnalysis(BaseModel):
     # JSON-LD fields
     ld_id: str = Field(
         serialization_alias="@id",
-        default_factory=lambda: "md:IRAnalysis/" + str(uuid4())
+        default_factory=lambda: "md:FAIRVibSpec/" + str(uuid4())
     )
     ld_type: list[str] = Field(
         serialization_alias="@type",
         default_factory = lambda: [
-            "md:IRAnalysis",
+            "md:FAIRVibSpec",
         ],
     )
     ld_context: dict[str, str | dict] = Field(
@@ -290,22 +290,26 @@ class Experiment(BaseModel):
     def add_to_measurements(
         self,
         id: str,
-        name: str,
+        vib_spec_type: VibSpecType,
         detection: Detection,
+        name: Optional[str]= None,
         varied_parameter_value: Optional[Value]= None,
         measurement_type: Optional[MeasurementTypes]= None,
         measurement_data: Optional[Dataset]= None,
         static_parameters: Optional[Parameters]= None,
+        instrument_parameters: Optional[SIFParameters]= None,
         **kwargs,
     ):
         params = {
             "id": id,
-            "name": name,
+            "vib_spec_type": vib_spec_type,
             "detection": detection,
+            "name": name,
             "varied_parameter_value": varied_parameter_value,
             "measurement_type": measurement_type,
             "measurement_data": measurement_data,
-            "static_parameters": static_parameters
+            "static_parameters": static_parameters,
+            "instrument_parameters": instrument_parameters
         }
 
         if "id" in kwargs:
@@ -458,12 +462,14 @@ class Measurement(BaseModel):
     ) # type: ignore
 
     id: str
-    name: str
+    vib_spec_type: VibSpecType
     detection: Detection
+    name: Optional[str] = Field(default=None)
     varied_parameter_value: Optional[Value] = Field(default=None)
     measurement_type: Optional[MeasurementTypes] = Field(default=None)
     measurement_data: Optional[Dataset] = Field(default=None)
     static_parameters: Optional[Parameters] = Field(default=None)
+    instrument_parameters: Optional[SIFParameters] = Field(default=None)
 
     # JSON-LD fields
     ld_id: str = Field(
@@ -483,6 +489,134 @@ class Measurement(BaseModel):
             "id": {
                 "@type": "@id",
             },
+        }
+    )
+
+
+    def set_attr_term(
+        self,
+        attr: str,
+        term: str | dict,
+        prefix: str | None = None,
+        iri: str | None = None
+    ):
+        """Sets the term for a given attribute in the JSON-LD object
+
+        Example:
+            # Using an IRI term
+            >> obj.set_attr_term("name", "http://schema.org/givenName")
+
+            # Using a prefix and term
+            >> obj.set_attr_term("name", "schema:givenName", "schema", "http://schema.org")
+
+            # Usinng a dictionary term
+            >> obj.set_attr_term("name", {"@id": "http://schema.org/givenName", "@type": "@id"})
+
+        Args:
+            attr (str): The attribute to set the term for
+            term (str | dict): The term to set for the attribute
+
+        Raises:
+            AssertionError: If the attribute is not found in the model
+        """
+
+        assert attr in self.model_fields, f"Attribute {attr} not found in {self.__class__.__name__}"
+
+        if prefix:
+            validate_prefix(term, prefix)
+
+        add_namespace(self, prefix, iri)
+        self.ld_context[attr] = term
+
+    def add_type_term(
+        self,
+        term: str,
+        prefix: str | None = None,
+        iri: str | None = None
+    ):
+        """Adds a term to the @type field of the JSON-LD object
+
+        Example:
+            # Using a term
+            >> obj.add_type_term("https://schema.org/Person")
+
+            # Using a prefixed term
+            >> obj.add_type_term("schema:Person", "schema", "https://schema.org/Person")
+
+        Args:
+            term (str): The term to add to the @type field
+            prefix (str, optional): The prefix to use for the term. Defaults to None.
+            iri (str, optional): The IRI to use for the term prefix. Defaults to None.
+
+        Raises:
+            ValueError: If prefix is provided but iri is not
+            ValueError: If iri is provided but prefix is not
+        """
+
+        if prefix:
+            validate_prefix(term, prefix)
+
+        add_namespace(self, prefix, iri)
+        self.ld_type.append(term)
+
+
+class SIFParameters(BaseModel):
+
+    model_config: ConfigDict = ConfigDict( # type: ignore
+        validate_assigment = True,
+    ) # type: ignore
+
+    sif_version: Optional[int] = Field(default=None)
+    experiment_time: Optional[int] = Field(default=None)
+    detector_temperature: Optional[float] = Field(default=None)
+    exposure_time: Optional[float] = Field(default=None)
+    cycle_time: Optional[float] = Field(default=None)
+    accumulated_cycle_time: Optional[float] = Field(default=None)
+    accumulated_cycles: Optional[int] = Field(default=None)
+    stack_cycle_time: Optional[float] = Field(default=None)
+    pixel_readout_time: Optional[float] = Field(default=None)
+    gain_dac: Optional[float] = Field(default=None)
+    gate_width: Optional[float] = Field(default=None)
+    grating_blaze: Optional[float] = Field(default=None)
+    detector_type: Optional[str] = Field(default=None)
+    detector_dimensions: list[int] = Field(default_factory=list)
+    original_filename: Optional[str] = Field(default=None)
+    shutter_time: list[float] = Field(default_factory=list)
+    spectrograph: Optional[str] = Field(default=None)
+    gate_gain: Optional[float] = Field(default=None)
+    gate_delay: Optional[float] = Field(default=None)
+    sif_calibration_version: Optional[int] = Field(default=None)
+    calibration_data: list[float] = Field(default_factory=list)
+    raman_excitation_wavelength: Optional[float] = Field(default=None)
+    frame_axis: Optional[str] = Field(default=None)
+    data_type: Optional[str] = Field(default=None)
+    image_axis: Optional[str] = Field(default=None)
+    number_of_frames: Optional[int] = Field(default=None)
+    number_of_sub_images: Optional[int] = Field(default=None)
+    total_length: Optional[int] = Field(default=None)
+    image_length: Optional[int] = Field(default=None)
+    xbin: Optional[int] = Field(default=None)
+    ybin: Optional[int] = Field(default=None)
+    timestamp_of_0: Optional[int] = Field(default=None)
+    size: list[int] = Field(default_factory=list)
+    tile: Optional[bytes] = Field(default=None)
+    offset: Optional[int] = Field(default=None)
+
+    # JSON-LD fields
+    ld_id: str = Field(
+        serialization_alias="@id",
+        default_factory=lambda: "md:SIFParameters/" + str(uuid4())
+    )
+    ld_type: list[str] = Field(
+        serialization_alias="@type",
+        default_factory = lambda: [
+            "md:SIFParameters",
+        ],
+    )
+    ld_context: dict[str, str | dict] = Field(
+        serialization_alias="@context",
+        default_factory = lambda: {
+            "md": "http://mdmodel.net/",
         }
     )
 
@@ -1579,6 +1713,10 @@ class Detection(Enum):
     ABSORBANCE = "absorbance"
     INTENSITY = "intensity"
     TRANSMITTANCE = "transmittance"
+
+class VibSpecType(Enum):
+    IR = "ir"
+    RAMAN = "raman"
 
 class UnitType(Enum):
     AMPERE = "ampere"
