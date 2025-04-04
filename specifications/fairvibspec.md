@@ -1,14 +1,14 @@
-# IRAnalysis data model
+# FAIRVibSpec data model
 
-Python object model specifications based on the sdRDM Python library.
+Python object model specifications based on the [md-models](https://github.com/FAIRChemistry/md-models) Rust library. The data model is designed to store both raw and processed vibrational spectroscopy (*i.e.* IR and Raman) data, as well as the parameters used for processing.
 
 ## Core objects
 
-### IRAnalysis
+### FAIRVibSpec
 
-Most meta object of your data model with some examples of sensible fields.
+Root object of the FAIRVibSpec data model. Meant to hold a single IR or Raman experiment. One experiment can contain multiple spectra.
 
-- __datetime_created__
+- datetime_created
   - Type: string
   - Description: Date and time this dataset has been created.
 - datetime_modified
@@ -23,7 +23,7 @@ Most meta object of your data model with some examples of sensible fields.
 
 ### Experiment
 
-This could be a very basic object that keeps track of the entire experiment.
+Container for a single experiment, possibly containing multiple spectra or multiple analyses.
 
 - __name__
   - Type: string
@@ -33,16 +33,16 @@ This could be a very basic object that keeps track of the entire experiment.
   - Description: Parameter that was varied between measurements.
 - static_parameters
   - Type: Parameters
-  - Description: Parameter object with attributes that do not change during the experiment or measurement series.
+  - Description: Object containing static parameters of the experiment.
 - measurements
   - Type: Measurement[]
-  - Description: Each single measurement is contained in one `measurement` object.
+  - Description: Container for all measurements done for the experiment.
 - analysis
   - Type: Analysis[]
-  - Description: Analysis procedure and parameters.
+  - Description: Container for all analysis steps and parameters.
 - results
   - Type: Result
-  - Description: List of final results calculated from measurements done for the experiment.
+  - Description: Container for the results of the experiment.
 
 ### Parameters
 
@@ -50,10 +50,10 @@ This object keeps track of important synthesis and measurement parameters.
 
 - mass
   - Type: Value
-  - Description: Mass of the IR sample
+  - Description: Mass of the sample
 - sample_area
   - Type: Value
-  - Description: Area of the IR sample
+  - Description: Area of the sample
 - literature_reference
   - Type: string[]
   - Description: Points to literature references used for the sample preparation
@@ -89,9 +89,12 @@ Contains one measurement done for the experiment. E.g. sample, unloaded sample a
 - __id__
   - Type: Identifier
   - Description: Unique identifier for the single measurement.
-- __name__
+- name
   - Type: string
   - Description: Descriptive name for the single measurement.
+- __vib_spec_type__
+  - Type: VibSpecType
+  - Description: Type of vibrational spectroscopy.
 - varied_parameter_value
   - Type: Value
   - Description: Value of the varied parameter for the given measurement.
@@ -107,6 +110,119 @@ Contains one measurement done for the experiment. E.g. sample, unloaded sample a
 - static_parameters
   - Type: Parameters
   - Description: Parameter object with attributes that do not change during the experiment or measurement series.
+- instrument_parameters
+  - Type: SIFParameters
+  - Description: Parameters of the instrument used for the measurement. Type depends on which vibrational spectroscopy is used and the instrument itself.
+
+### SIFParameters
+
+Parameters extracted from the SIF file of the Raman spectrometer used for the measurement.
+
+- sif_version
+  - Type: integer
+  - Description: SIF file version number.
+- experiment_time
+  - Type: integer
+  - Description: Unix timestamp of the experiment.
+- detector_temperature
+  - Type: float
+  - Description: Temperature of the detector in degrees Celsius.
+- exposure_time
+  - Type: float
+  - Description: Exposure time in seconds.
+- cycle_time
+  - Type: float
+  - Description: Cycle time in seconds.
+- accumulated_cycle_time
+  - Type: float
+  - Description: Total accumulated cycle time in seconds.
+- accumulated_cycles
+  - Type: integer
+  - Description: Number of accumulated cycles.
+- stack_cycle_time
+  - Type: float
+  - Description: Stack cycle time.
+- pixel_readout_time
+  - Type: float
+  - Description: Readout time per pixel.
+- gain_dac
+  - Type: float
+  - Description: Gain DAC value.
+- gate_width
+  - Type: float
+  - Description: Gate width.
+- grating_blaze
+  - Type: float
+  - Description: Grating blaze parameter.
+- detector_type
+  - Type: string
+  - Description: Type of detector (e.g., DU420_OE).
+- detector_dimensions
+  - Type: integer[]
+  - Description: Dimensions of the detector.
+- original_filename
+  - Type: string
+  - Description: Original filename of the data file.
+- shutter_time
+  - Type: float[]
+  - Description: Shutter times.
+- spectrograph
+  - Type: string
+  - Description: Identifier of the spectrograph.
+- gate_gain
+  - Type: float
+  - Description: Gate gain.
+- gate_delay
+  - Type: float
+  - Description: Gate delay.
+- sif_calibration_version
+  - Type: integer
+  - Description: SIF calibration version.
+- calibration_data
+  - Type: float[]
+  - Description: Calibration parameters.
+- raman_excitation_wavelength
+  - Type: float
+  - Description: Excitation wavelength in nm.
+- frame_axis
+  - Type: string
+  - Description: Label of the frame axis.
+- data_type
+  - Type: string
+  - Description: Data type (e.g., 'Counts').
+- image_axis
+  - Type: string
+  - Description: Label of the image axis.
+- number_of_frames
+  - Type: integer
+  - Description: Number of frames.
+- number_of_sub_images
+  - Type: integer
+  - Description: Number of sub-images.
+- total_length
+  - Type: integer
+  - Description: Total length of the spectral data.
+- image_length
+  - Type: integer
+  - Description: Length of the image (should match TotalLength).
+- xbin
+  - Type: integer
+  - Description: X-axis binning factor.
+- ybin
+  - Type: integer
+  - Description: Y-axis binning factor.
+- timestamp_of_0
+  - Type: integer
+  - Description: Initial timestamp.
+- size
+  - Type: integer[]
+  - Description: Size of the data array.
+- tile
+  - Type: string
+  - Description: Tiling information for the dataset.
+- offset
+  - Type: integer
+  - Description: Data offset.
 
 ### Analysis
 
@@ -245,4 +361,13 @@ Detection method used in the experiment. "Transmission" expects minima in the sp
 TRANSMITTANCE = "transmittance"
 ABSORBANCE = "absorbance"
 INTENSITY = "intensity"
+```
+
+### VibSpecType
+
+Type of vibrational spectroscopy.
+
+```python
+IR = "ir"
+RAMAN = "raman"
 ```
