@@ -129,7 +129,7 @@ dmypy.json
 .pyre/
 
 # sample data
-IR_sample_data/
+data/
 
 # VS code config
 .vscode
