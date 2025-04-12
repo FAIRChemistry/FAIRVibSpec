@@ -1,15 +1,36 @@
 import json
 from pathlib import Path
 from dataclasses import asdict
-from typing import Dict, Any
+from typing import Dict, Any, List, Union
 
-from .models import SampleMetadata, MeasurementMetadata, PeakMetadata, FitParameters
+from .models import (
+    SampleMetadata,
+    MeasurementMetadata,
+    PeakMetadata,
+    FitParameters,
+)
 
 
 class BaseIRHandler:
-    """Base class for IR data handling with common metadata functionality"""
+    """Base class for handling IR spectroscopy data and metadata.
 
-    def __init__(self, path_to_directory, folder):
+    This class provides common functionality for handling IR spectroscopy data,
+    including metadata management, file operations, and basic data processing.
+    It serves as the base class for more specialized IR data handlers.
+
+    Attributes:
+        path (Path): Path to the directory containing IR data files
+        folder (str): Name of the folder containing the data
+        metadata (Dict[str, Any]): Dictionary containing sample and measurement metadata
+    """
+
+    def __init__(self, path_to_directory: Union[str, Path], folder: str) -> None:
+        """Initialize the base IR handler.
+
+        Args:
+            path_to_directory (Union[str, Path]): Path to the directory containing IR data files
+            folder (str): Name of the folder containing the data
+        """
         self.path = Path(path_to_directory)
         self.folder = folder
         self.metadata = {
@@ -18,15 +39,32 @@ class BaseIRHandler:
             "measurements": [],
         }
 
-    def save_json(self, json_filename):
-        """Saves all metadata and results to a JSON file."""
+    def save_json(self, json_filename: Union[str, Path]) -> None:
+        """Save all metadata and results to a JSON file.
+
+        Args:
+            json_filename (Union[str, Path]): Path to the output JSON file
+        """
         json_path = Path(json_filename)
         with json_path.open("w") as json_file:
             json.dump(self.metadata, json_file, indent=4)
         print(f"Data saved to {json_path}")
 
-    def add_sample_metadata(self, mass, length, width, extinction_coefficient):
-        """Adds sample metadata"""
+    def add_sample_metadata(
+        self,
+        mass: float,
+        length: float,
+        width: float,
+        extinction_coefficient: float,
+    ) -> None:
+        """Add sample metadata to the handler.
+
+        Args:
+            mass (float): Sample mass in grams
+            length (float): Sample length in centimeters
+            width (float): Sample width in centimeters
+            extinction_coefficient (float): Extinction coefficient for the sample
+        """
         sample = SampleMetadata(
             name=self.folder,
             mass=mass,
@@ -37,9 +75,22 @@ class BaseIRHandler:
         self.metadata["sample"] = asdict(sample)
 
     def add_measurement_metadata(
-        self, data_file, measurement_type, temperature, background_file, baseline
-    ):
-        """Adds measurement metadata for each sample."""
+        self,
+        data_file: str,
+        measurement_type: str,
+        temperature: float,
+        background_file: str,
+        baseline: float,
+    ) -> None:
+        """Add measurement metadata for a sample.
+
+        Args:
+            data_file (str): Name of the data file
+            measurement_type (str): Type of measurement (e.g., 'sample', 'background')
+            temperature (float): Measurement temperature in Celsius
+            background_file (str): Name of the background file used
+            baseline (float): Baseline value for the measurement
+        """
         measurement = MeasurementMetadata(
             data_file=data_file,
             type=measurement_type,
@@ -49,8 +100,29 @@ class BaseIRHandler:
         )
         self.metadata["measurements"].append(asdict(measurement))
 
-    def process_measurement(self, fit, index, name, sample_params):
-        """Helper function to process a single measurement"""
+    def process_measurement(
+        self,
+        fit: Any,
+        index: int,
+        name: str,
+        sample_params: Dict[str, Any],
+    ) -> List[float]:
+        """Process a single measurement and calculate acid sites.
+
+        Args:
+            fit: Instance of a fitter class (e.g., PeakFitter)
+            index (int): Index of the measurement to process
+            name (str): Name for the output files
+            sample_params (Dict[str, Any]): Dictionary containing sample parameters:
+                - length (float): Sample length
+                - width (float): Sample width
+                - mass (float): Sample mass
+                - abs_coeff (float): Absorption coefficient
+                - peaks (int): Number of peaks to fit
+
+        Returns:
+            List[float]: List containing the calculated number of acid sites
+        """
         fit.extract_data(index)
 
         # Calculate sites
@@ -70,8 +142,14 @@ class BaseIRHandler:
 
         return N
 
-    def save_results_to_txt(self, folder, name, results):
-        """Helper function to save results to text file"""
+    def save_results_to_txt(self, folder: str, name: str, results: List[float]) -> None:
+        """Save analysis results to a text file.
+
+        Args:
+            folder (str): Name of the folder for output
+            name (str): Name of the measurement
+            results (List[float]): List of results to save
+        """
         with open(f"{folder}.txt", "a") as file:
             text = str(results).replace("]", "").replace("[", "")
             file.writelines(f"{name}, {text}\n")

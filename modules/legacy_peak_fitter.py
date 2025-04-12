@@ -18,12 +18,15 @@ from scipy.signal import find_peaks, peak_widths
 from scipy.optimize import curve_fit
 from typing import List, Optional, Union, Dict, Any, Tuple
 from dataclasses import dataclass
-from .helpers import calculate_peak_area, extract_metadata_from_filename
+from .utils import calculate_peak_area, extract_metadata_from_filename
 from .validators import (
     validate_path,
     validate_gaussian_parameters,
     validate_measurement_data,
     validate_sample_parameters,
+    validate_peak_ranges,
+    validate_fit_parameters,
+    validate_surface_area,
 )
 from .models import (
     SampleMetadata,
@@ -163,7 +166,7 @@ class GaussianFit(BaseIRHandler):
             print(f"File {json_path} not found.")
             return
 
-        data_file = list(self.input_files)[index].stem  # Remove .stem instead of [:-5]
+        data_file = list(self.input_files)[index][:-5]  # Remove last 5 chars (_data)
 
         # Find and update measurement
         for measurement in existing_metadata.get("measurements", []):
@@ -1173,7 +1176,6 @@ class GaussianFit(BaseIRHandler):
         extinction_coefficient_bronsted: float,
         extinction_coefficient_lewis: float,
         peaks: int = 3,
-        use_individual_fitting: bool = True,
     ) -> list[float]:
         """Calculate number of acid sites from peak integrals.
 
@@ -1184,7 +1186,6 @@ class GaussianFit(BaseIRHandler):
             extinction_coefficient_bronsted (float): Extinction coefficient for Brønsted sites in cm μmol^-1
             extinction_coefficient_lewis (float): Extinction coefficient for Lewis sites in cm μmol^-1
             peaks (int, optional): Number of peaks to fit. Defaults to 3.
-            use_individual_fitting (bool, optional): Whether to use individual peak fitting. Defaults to True.
 
         Returns:
             list: List of floats with number of acid sites in μmol g^-1
@@ -1229,18 +1230,13 @@ class GaussianFit(BaseIRHandler):
                 self.width.append(10.0)
                 self.fwhm.append(23.55)
 
-        # Perform the appropriate fitting procedure based on the option
-        if use_individual_fitting:
-            print("Using individual peak fitting for each spectral region")
-            self._fit_individual_peaks()
+        # Perform the appropriate fitting procedure
+        if hasattr(self, "has_shoulder") and self.has_shoulder:
+            print("Using 4-peak fit with Lewis shoulder detection")
+            self._gauss_fit4()
         else:
-            # Default to the original combined fitting approach
-            if hasattr(self, "has_shoulder") and self.has_shoulder:
-                print("Using 4-peak fit with Lewis shoulder detection")
-                self._gauss_fit4()
-            else:
-                print("Using standard 3-peak fit")
-                self._gauss_fit3()
+            print("Using standard 3-peak fit")
+            self._gauss_fit3()
 
         # Make sure gauss_peak4 is initialized even if no shoulder is detected
         if not hasattr(self, "gauss_peak4") or self.gauss_peak4 is None:
@@ -1471,13 +1467,16 @@ class GaussianFit(BaseIRHandler):
         """
         self.has_shoulder = has_shoulder
 
-    def get_gaussian_plot(self, name: str, use_individual_fitting: bool = True) -> None:
-        """Produces plot with Gaussian fits, with options for individual or combined fitting.
+    def get_gaussian_plot(self, name: str = None) -> None:
+        """Produces plot with Gaussian fits.
 
         Args:
-            name (str): name of the saved file
-            use_individual_fitting (bool, optional): Whether to use individual peak fitting. Defaults to True.
+            name (str, optional): name of the saved file. If None, uses self.folder. Defaults to None.
         """
+        # Use folder name if no name provided
+        if name is None:
+            name = self.folder
+
         # Clear previous peak data
         self.height = []
         self.center = []
@@ -1514,118 +1513,89 @@ class GaussianFit(BaseIRHandler):
         peaks = []
 
         try:
-            # Perform fitting based on chosen method
-            if use_individual_fitting:
-                print("Using individual peak fitting for plot")
-                self._fit_individual_peaks()
-
+            # Use combined fitting approach
+            if hasattr(self, "has_shoulder") and self.has_shoulder:
+                print("Using 4-peak fit with Lewis shoulder")
+                self._gauss_fit4()
                 # Plot overall fit
-                total_fit = self.gauss_peak1 + self.gauss_peak2 + self.gauss_peak3
-                if hasattr(self, "has_shoulder") and self.has_shoulder:
-                    total_fit += self.gauss_peak4
-                ax1.plot(self.x_array, total_fit, linestyle="--", color="black")
+                try:
+                    # Get total fit
+                    fit_curve = (
+                        self.gauss_peak1
+                        + self.gauss_peak2
+                        + self.gauss_peak3
+                        + self.gauss_peak4
+                    )
+                    ax1.plot(self.x_array, fit_curve, linestyle="--", color="black")
+                except Exception as e:
+                    print(f"Error calculating combined fit: {str(e)}")
 
-                # Setup peak information for plotting
-                if hasattr(self, "has_shoulder") and self.has_shoulder:
-                    print("Including Lewis shoulder in plot")
-                    peaks = [
-                        (self.gauss_peak1, "b", "Lewis (1440-1475 cm⁻¹)"),
-                        (self.gauss_peak4, "g", "Lewis Shoulder"),
-                        (self.gauss_peak2, "y", "Mixed (1470-1510 cm⁻¹)"),
-                        (self.gauss_peak3, "r", "Brønsted (1520-1560 cm⁻¹)"),
-                    ]
-                else:
-                    peaks = [
-                        (self.gauss_peak1, "b", "Lewis (1440-1475 cm⁻¹)"),
-                        (self.gauss_peak2, "y", "Mixed (1470-1510 cm⁻¹)"),
-                        (self.gauss_peak3, "r", "Brønsted (1520-1560 cm⁻¹)"),
-                    ]
+                # When using shoulder detection:
+                # gauss_peak1 = Lewis main (lowest wavenumber - 1440-1475 cm⁻¹)
+                # gauss_peak2 = Mixed (middle wavenumber - 1470-1510 cm⁻¹)
+                # gauss_peak3 = Brønsted (highest wavenumber - 1520-1560 cm⁻¹)
+                # gauss_peak4 = Lewis shoulder (part of Lewis peak)
+                peaks = [
+                    (
+                        self.gauss_peak1,
+                        "b",
+                        "Lewis (1440-1475 cm⁻¹)",
+                    ),  # Lowest wavenumber
+                    (
+                        self.gauss_peak4,
+                        "g",
+                        "Lewis Shoulder",
+                    ),  # Lewis shoulder
+                    (
+                        self.gauss_peak2,
+                        "y",
+                        "Mixed (1470-1510 cm⁻¹)",
+                    ),  # Middle peak
+                    (
+                        self.gauss_peak3,
+                        "r",
+                        "Brønsted (1520-1560 cm⁻¹)",
+                    ),  # Highest wavenumber
+                ]
             else:
-                # Use original combined fitting approach
-                if hasattr(self, "has_shoulder") and self.has_shoulder:
-                    print("Using 4-peak fit with Lewis shoulder")
-                    self._gauss_fit4()
-                    # Plot overall fit
+                print("Using standard 3-peak fit")
+                self._gauss_fit3()
+                # Plot overall fit
+                try:
+                    fit_curve = self._3gaussian(self.x_array, *self.opt_params)
+                    ax1.plot(self.x_array, fit_curve, linestyle="--", color="black")
+                except Exception as e:
+                    print(f"Error calculating combined fit: {str(e)}")
+                    # Try alternative approach
                     try:
-                        # Get total fit
                         fit_curve = (
-                            self.gauss_peak1
-                            + self.gauss_peak2
-                            + self.gauss_peak3
-                            + self.gauss_peak4
+                            self.gauss_peak1 + self.gauss_peak2 + self.gauss_peak3
                         )
                         ax1.plot(self.x_array, fit_curve, linestyle="--", color="black")
-                    except Exception as e:
-                        print(f"Error calculating combined fit: {str(e)}")
+                    except Exception as e2:
+                        print(f"Error with alternative fit: {str(e2)}")
 
-                    # When using shoulder detection:
-                    # gauss_peak1 = Lewis main (lowest wavenumber - 1440-1475 cm⁻¹)
-                    # gauss_peak2 = Mixed (middle wavenumber - 1470-1510 cm⁻¹)
-                    # gauss_peak3 = Brønsted (highest wavenumber - 1520-1560 cm⁻¹)
-                    # gauss_peak4 = Lewis shoulder (part of Lewis peak)
-                    peaks = [
-                        (
-                            self.gauss_peak1,
-                            "b",
-                            "Lewis (1440-1475 cm⁻¹)",
-                        ),  # Lowest wavenumber
-                        (
-                            self.gauss_peak4,
-                            "g",
-                            "Lewis Shoulder",
-                        ),  # Lewis shoulder
-                        (
-                            self.gauss_peak2,
-                            "y",
-                            "Mixed (1470-1510 cm⁻¹)",
-                        ),  # Middle peak
-                        (
-                            self.gauss_peak3,
-                            "r",
-                            "Brønsted (1520-1560 cm⁻¹)",
-                        ),  # Highest wavenumber
-                    ]
-                else:
-                    print("Using standard 3-peak fit")
-                    self._gauss_fit3()
-                    # Plot overall fit
-                    try:
-                        fit_curve = self._3gaussian(self.x_array, *self.opt_params)
-                        ax1.plot(self.x_array, fit_curve, linestyle="--", color="black")
-                    except Exception as e:
-                        print(f"Error calculating combined fit: {str(e)}")
-                        # Try alternative approach
-                        try:
-                            fit_curve = (
-                                self.gauss_peak1 + self.gauss_peak2 + self.gauss_peak3
-                            )
-                            ax1.plot(
-                                self.x_array, fit_curve, linestyle="--", color="black"
-                            )
-                        except Exception as e2:
-                            print(f"Error with alternative fit: {str(e2)}")
-
-                    # For standard 3-peak fit:
-                    # gauss_peak1 = Lewis (lowest wavenumber - 1440-1475 cm⁻¹)
-                    # gauss_peak2 = Mixed (middle wavenumber - 1470-1510 cm⁻¹)
-                    # gauss_peak3 = Brønsted (highest wavenumber - 1520-1560 cm⁻¹)
-                    peaks = [
-                        (
-                            self.gauss_peak1,
-                            "b",
-                            "Lewis (1440-1475 cm⁻¹)",
-                        ),  # Lowest wavenumber
-                        (
-                            self.gauss_peak2,
-                            "y",
-                            "Mixed (1470-1510 cm⁻¹)",
-                        ),  # Middle peak
-                        (
-                            self.gauss_peak3,
-                            "r",
-                            "Brønsted (1520-1560 cm⁻¹)",
-                        ),  # Highest wavenumber
-                    ]
+                # For standard 3-peak fit:
+                # gauss_peak1 = Lewis (lowest wavenumber - 1440-1475 cm⁻¹)
+                # gauss_peak2 = Mixed (middle wavenumber - 1470-1510 cm⁻¹)
+                # gauss_peak3 = Brønsted (highest wavenumber - 1520-1560 cm⁻¹)
+                peaks = [
+                    (
+                        self.gauss_peak1,
+                        "b",
+                        "Lewis (1440-1475 cm⁻¹)",
+                    ),  # Lowest wavenumber
+                    (
+                        self.gauss_peak2,
+                        "y",
+                        "Mixed (1470-1510 cm⁻¹)",
+                    ),  # Middle peak
+                    (
+                        self.gauss_peak3,
+                        "r",
+                        "Brønsted (1520-1560 cm⁻¹)",
+                    ),  # Highest wavenumber
+                ]
 
             # Plot individual peaks
             for peak, color, label in peaks:
@@ -1644,36 +1614,6 @@ class GaussianFit(BaseIRHandler):
 
         except Exception as e:
             print(f"Error during fitting: {str(e)}")
-            # Fall back to individual fitting as a last resort
-            print("Falling back to simple individual peak fitting...")
-            try:
-                self._fit_individual_peaks()
-                total_fit = self.gauss_peak1 + self.gauss_peak2 + self.gauss_peak3
-                ax1.plot(self.x_array, total_fit, linestyle="--", color="black")
-
-                peaks = [
-                    (self.gauss_peak1, "b", "Lewis (1440-1475 cm⁻¹)"),
-                    (self.gauss_peak2, "y", "Mixed (1470-1510 cm⁻¹)"),
-                    (self.gauss_peak3, "r", "Brønsted (1520-1560 cm⁻¹)"),
-                ]
-
-                for peak, color, label in peaks:
-                    if peak is not None and len(peak) > 0:
-                        ax1.plot(
-                            self.x_array, peak, color=color, alpha=0.5, label=label
-                        )
-                        # For consistency, always use the same fill approach
-                        ax1.fill_between(
-                            x=self.x_array,
-                            y1=np.zeros_like(
-                                peak
-                            ),  # Always use zeros as baseline for all methods
-                            y2=peak,
-                            facecolor=color,
-                            alpha=0.1,  # Keep consistent alpha values
-                        )
-            except Exception as e2:
-                print(f"Final fallback fitting also failed: {str(e2)}")
 
         # Add legend and labels
         ax1.legend()
@@ -1682,18 +1622,11 @@ class GaussianFit(BaseIRHandler):
         ax1.invert_xaxis()
 
         # Set title to indicate fitting method
-        if use_individual_fitting:
-            fig.suptitle(
-                f"Individual Peak Fitting (Shoulder: {'Yes' if hasattr(self, 'has_shoulder') and self.has_shoulder else 'No'})",
-                fontsize=10,
-                y=0.95,
-            )
-        else:
-            fig.suptitle(
-                f"Combined Peak Fitting (Shoulder: {'Yes' if hasattr(self, 'has_shoulder') and self.has_shoulder else 'No'})",
-                fontsize=10,
-                y=0.95,
-            )
+        fig.suptitle(
+            f"Gaussian Fit (Shoulder: {'Yes' if hasattr(self, 'has_shoulder') and self.has_shoulder else 'No'})",
+            fontsize=10,
+            y=0.95,
+        )
 
         # Plot residuals with new limits
         if self.residual is not None and len(self.residual) > 0:
@@ -1711,8 +1644,7 @@ class GaussianFit(BaseIRHandler):
         ax2.set_ylim(-0.1, 0.1)  # Changed from -0.3, 0.3 to -0.1, 0.1
 
         # Save and show the plot
-        method_suffix = "individual" if use_individual_fitting else "combined"
-        fig.savefig(f"{name}_fit_{method_suffix}.png", dpi=400)
+        fig.savefig(f"{name}_fit.png", dpi=400)
         plt.show()
 
     def save_results_to_txt(self, folder, name, results):

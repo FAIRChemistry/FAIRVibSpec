@@ -1,6 +1,6 @@
 from pathlib import Path
 import numpy as np
-from typing import Union, List
+from typing import Union, List, Dict, Optional
 import pandas as pd
 
 
@@ -67,3 +67,67 @@ def validate_measurement_data(wavenumber, absorbance) -> None:
         raise ValueError("Wavenumber and absorbance arrays must have same length")
     if len(wavenumber) == 0:
         raise ValueError("Data arrays cannot be empty")
+
+
+def validate_peak_ranges(
+    x: np.ndarray, min_w: float, max_w: float, region_name: str
+) -> None:
+    """Validate that the data range is appropriate for the region.
+
+    Args:
+        x: Wavenumber data array
+        min_w: Minimum expected wavenumber
+        max_w: Maximum expected wavenumber
+        region_name: Name of the region being validated
+
+    Raises:
+        ValueError: If data range is outside expected bounds
+    """
+    if min(x) < min_w or max(x) > max_w:
+        raise ValueError(
+            f"Data range {min(x)}-{max(x)} cm⁻¹ is outside expected range "
+            f"{min_w}-{max_w} cm⁻¹ for {region_name}"
+        )
+
+
+def validate_fit_parameters(params: Dict[str, float], region_name: str) -> None:
+    """Check if fit parameters are physically reasonable.
+
+    Args:
+        params: Dictionary of fit parameters
+        region_name: Name of the region being validated
+
+    Raises:
+        ValueError: If parameters are physically unreasonable
+    """
+    if params["center"] < 1400 or params["center"] > 1600:
+        raise ValueError(
+            f"Unusual center position {params['center']} cm⁻¹ for {region_name}"
+        )
+    if params["sigma"] < 0 or params["gamma"] < 0:
+        raise ValueError(f"Negative width parameters detected in {region_name} fit")
+    if params["height"] < 0:
+        raise ValueError(f"Negative height detected in {region_name} fit")
+
+
+def validate_surface_area(
+    surface_area: Optional[float], error_surface_area: Optional[float]
+) -> None:
+    """Validate surface area parameters.
+
+    Args:
+        surface_area: Surface area value in m²/g
+        error_surface_area: Error in surface area in m²/g
+
+    Raises:
+        ValueError: If parameters are invalid
+    """
+    if surface_area is not None:
+        if not isinstance(surface_area, (int, float)) or surface_area <= 0:
+            raise ValueError("Surface area must be a positive number")
+        if error_surface_area is not None:
+            if (
+                not isinstance(error_surface_area, (int, float))
+                or error_surface_area < 0
+            ):
+                raise ValueError("Surface area error must be a non-negative number")
