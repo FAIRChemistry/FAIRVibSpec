@@ -14,7 +14,6 @@ import json
 import pandas as pd
 import numpy as np
 from .models import SampleMetadata, MeasurementMetadata
-from .peak_fitter import PeakFitter
 import re
 
 
