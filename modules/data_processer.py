@@ -112,40 +112,95 @@ class IRDataHandler(BaseIRHandler):
 
     def add_sample_metadata(
         self,
-        mass: float,
-        length: float,
-        width: float,
+        sample_mass: float,
+        sample_length: float,
+        sample_width: float,
         extinction_coefficient_bronsted: float,
         extinction_coefficient_lewis: float,
+        error_sample_length: float = 0.001,
+        error_sample_width: float = 0.001,
+        error_sample_mass: float = 0.0001,
+        surface_area: Optional[float] = None,
+        error_surface_area: Optional[float] = None,
+        mass_unit: str = "g",
+        length_unit: str = "cm",
+        extinction_coefficient_unit: str = "mmol cm^-2",
+        surface_area_unit: str = "m²/g",
     ) -> None:
         """Add sample metadata using SampleMetadata dataclass.
 
         Args:
-            mass (float): Sample mass in grams
-            length (float): Sample length in centimeters
-            width (float): Sample width in centimeters
+            sample_mass (float): Sample mass in grams
+            sample_length (float): Sample length in centimeters
+            sample_width (float): Sample width in centimeters
             extinction_coefficient_bronsted (float): Extinction coefficient for Bronsted sites
             extinction_coefficient_lewis (float): Extinction coefficient for Lewis sites
+            error_sample_length (float, optional): Error in sample length. Defaults to 0.001.
+            error_sample_width (float, optional): Error in sample width. Defaults to 0.001.
+            error_sample_mass (float, optional): Error in sample mass. Defaults to 0.0001.
+            surface_area (Optional[float], optional): Surface area in m²/g. Defaults to None.
+            error_surface_area (Optional[float], optional): Error in surface area. Defaults to None.
+            mass_unit (str, optional): Unit for mass. Defaults to "g".
+            length_unit (str, optional): Unit for length. Defaults to "cm".
+            extinction_coefficient_unit (str, optional): Unit for extinction coefficients. Defaults to "mmol cm^-2".
+            surface_area_unit (str, optional): Unit for surface area. Defaults to "m²/g".
 
         Raises:
             ValueError: If any of the parameters are invalid
         """
         validate_sample_parameters(
-            mass,
-            length,
-            width,
+            sample_mass,
+            sample_length,
+            sample_width,
             extinction_coefficient_bronsted,
             extinction_coefficient_lewis,
         )
         sample = SampleMetadata(
             name=self.folder,
-            mass=mass,
-            length=length,
-            width=width,
+            mass=sample_mass,
+            length=sample_length,
+            width=sample_width,
             extinction_coefficient_bronsted=extinction_coefficient_bronsted,
             extinction_coefficient_lewis=extinction_coefficient_lewis,
+            mass_unit=mass_unit,
+            length_unit=length_unit,
+            extinction_coefficient_unit=extinction_coefficient_unit,
         )
-        self.metadata["sample"] = vars(sample)
+        self.metadata["sample"] = {
+            "mass": {
+                "value": sample_mass,
+                "error": error_sample_mass,
+                "unit": mass_unit,
+            },
+            "length": {
+                "value": sample_length,
+                "error": error_sample_length,
+                "unit": length_unit,
+            },
+            "width": {
+                "value": sample_width,
+                "error": error_sample_width,
+                "unit": length_unit,
+            },
+            "extinction_coefficient": {
+                "bronsted": {
+                    "value": extinction_coefficient_bronsted,
+                    "unit": extinction_coefficient_unit,
+                },
+                "lewis": {
+                    "value": extinction_coefficient_lewis,
+                    "unit": extinction_coefficient_unit,
+                },
+            },
+        }
+
+        # Add surface area if provided
+        if surface_area is not None:
+            self.metadata["sample"]["surface_area"] = {
+                "value": surface_area,
+                "error": error_surface_area if error_surface_area is not None else 0,
+                "unit": surface_area_unit,
+            }
 
     def add_measurement_metadata(
         self,
@@ -287,6 +342,13 @@ class IRDataHandler(BaseIRHandler):
 
         background_absorbance = self.bckgrnd_file["absorbance"]
 
+        # Find the background file name
+        background_file = None
+        for file in self.input_files:
+            if file.endswith("_background"):
+                background_file = file
+                break
+
         for index, data_set in enumerate(list_of_df):
             background_corrected_absorbance = (
                 data_set["absorbance"] - background_absorbance
@@ -328,7 +390,9 @@ class IRDataHandler(BaseIRHandler):
                 data_file=filtered_files[index],
                 measurement_type="sample",
                 temperature=self.extract_desorption_temperature(filtered_files[index]),
-                background_file="background_file",
+                background_file=(
+                    background_file if background_file else "background_file"
+                ),
                 baseline=baseline_absorbance,
             )
 

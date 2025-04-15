@@ -1224,17 +1224,20 @@ class PeakFitter(BaseIRHandler):
         if not hasattr(self, "results") or not self.results:
             raise ValueError("No results available. Run analyze() first.")
 
-        # Find background file
-        background_file = None
-        for file_path in self.input_files.values():
-            if str(file_path).endswith("background"):
-                background_file = str(file_path)
-                break
-
         # Get the current measurement data
         data_file = str(
             self.get_file_by_index(index).stem
         )  # Get just the file name without extension
+        # Remove "_corr" suffix if present for matching
+        data_file_base = data_file.replace("_corr", "")
+
+        # Find the existing measurement to get baseline and background file
+        existing_measurement = None
+        for measurement in data.get("measurements", []):
+            if measurement["data_file"].replace("_corr", "") == data_file_base:
+                existing_measurement = measurement
+                break
+
         current_measurement = {
             "data_file": data_file,
             "type": "sample",
@@ -1242,9 +1245,13 @@ class PeakFitter(BaseIRHandler):
                 str(self.get_file_by_index(index))
             ),
             "background_file": (
-                background_file if background_file else "background_file"
+                existing_measurement["background_file"]
+                if existing_measurement
+                else "background_file"
             ),
-            "baseline": 0.0,  # This should be updated with actual baseline
+            "baseline": (
+                existing_measurement["baseline"] if existing_measurement else 0.0
+            ),
             "temperature_unit": "C",
             "peaks": [],
             "fits": [],
@@ -1348,7 +1355,9 @@ class PeakFitter(BaseIRHandler):
         # Find and update measurement
         measurement_found = False
         for measurement in data.get("measurements", []):
-            if measurement["data_file"] == data_file:
+            # Remove "_corr" suffix from both files for comparison
+            existing_file = measurement["data_file"].replace("_corr", "")
+            if existing_file == data_file_base:
                 print(f"Found measurement for {data_file}")
                 # Update existing measurement
                 measurement.update(current_measurement)
@@ -1794,6 +1803,79 @@ class PeakFitter(BaseIRHandler):
             warnings.warn(str(e))
         if np.max(np.abs(residuals)) > 0.1:
             warnings.warn("Large residuals detected in fit")
+
+    def load_metadata_from_json(self, json_filename: Union[str, Path]) -> None:
+        """Load sample metadata from a JSON file.
+
+        Args:
+            json_filename (Union[str, Path]): Path to the JSON file containing metadata
+        """
+        try:
+            with open(json_filename, "r") as f:
+                data = json.load(f)
+
+            # Check for metadata in the sample key
+            if "sample" in data:
+                sample_data = data["sample"]
+                # Check if the data is in the new structure
+                if "extinction_coefficient" in sample_data:
+                    self.add_sample_metadata(
+                        sample_mass=sample_data["mass"]["value"],
+                        sample_length=sample_data["length"]["value"],
+                        sample_width=sample_data["width"]["value"],
+                        extinction_coefficient_bronsted=sample_data[
+                            "extinction_coefficient"
+                        ]["bronsted"]["value"],
+                        extinction_coefficient_lewis=sample_data[
+                            "extinction_coefficient"
+                        ]["lewis"]["value"],
+                        error_sample_length=sample_data["length"]["error"],
+                        error_sample_width=sample_data["width"]["error"],
+                        error_sample_mass=sample_data["mass"]["error"],
+                        surface_area=sample_data.get("surface_area", {}).get("value"),
+                        error_surface_area=sample_data.get("surface_area", {}).get(
+                            "error"
+                        ),
+                        mass_unit=sample_data["mass"]["unit"],
+                        length_unit=sample_data["length"]["unit"],
+                        extinction_coefficient_unit=sample_data[
+                            "extinction_coefficient"
+                        ]["bronsted"]["unit"],
+                    )
+                else:
+                    # Handle old structure
+                    self.add_sample_metadata(
+                        sample_mass=sample_data["mass"],
+                        sample_length=sample_data["length"],
+                        sample_width=sample_data["width"],
+                        extinction_coefficient_bronsted=sample_data[
+                            "extinction_coefficient_bronsted"
+                        ],
+                        extinction_coefficient_lewis=sample_data[
+                            "extinction_coefficient_lewis"
+                        ],
+                        error_sample_length=sample_data.get("error_length", 0.001),
+                        error_sample_width=sample_data.get("error_width", 0.001),
+                        error_sample_mass=sample_data.get("error_mass", 0.0001),
+                        surface_area=sample_data.get("surface_area"),
+                        error_surface_area=sample_data.get("error_surface_area"),
+                        mass_unit=sample_data.get("mass_unit", "g"),
+                        length_unit=sample_data.get("length_unit", "cm"),
+                        extinction_coefficient_unit=sample_data.get(
+                            "extinction_coefficient_unit", "mmol cm^-2"
+                        ),
+                    )
+            else:
+                print(f"No sample metadata found in {json_filename}")
+                return
+
+            print(f"Successfully loaded metadata from {json_filename}")
+        except FileNotFoundError:
+            print(f"File {json_filename} not found")
+        except json.JSONDecodeError:
+            print(f"Error decoding JSON file {json_filename}")
+        except Exception as e:
+            print(f"Error loading metadata: {str(e)}")
 
 
 if __name__ == "__main__":
