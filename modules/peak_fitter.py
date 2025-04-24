@@ -460,6 +460,9 @@ class PeakFitter(BaseIRHandler):
         best_fit = None
         best_residuals = None
         min_residual_sum = float("inf")
+        good_enough_threshold = (
+            0.01  # Stop if we find a fit with residuals below this value
+        )
 
         # Base parameters from peak detection
         base_height = peak_data["height"]
@@ -469,12 +472,12 @@ class PeakFitter(BaseIRHandler):
 
         # Define bounds for parameters to ensure non-negative values
         # For Voigt: [amp, center, sigma, gamma]
-        bounds = ([0, -np.inf, 0, 0], [np.inf, np.inf, np.inf, np.inf])
+        bounds = ([-np.inf, -np.inf, 0, 0], [np.inf, np.inf, np.inf, np.inf])
 
-        for attempt in range(10):
+        for attempt in range(20):  # Increased from 10 to 20 attempts
             if has_shoulder:
                 print(
-                    f"Attempt {attempt + 1}: Using shoulder fit for {region_name} region"
+                    f"Attempt {attempt + 1}/20: Using shoulder fit for {region_name} region"
                 )
 
                 # Check for initial guesses from previous fit
@@ -499,7 +502,9 @@ class PeakFitter(BaseIRHandler):
 
                     # Better initial guess for shoulder peak
                     shoulder_center = base_center + 15  # Fixed offset from main peak
-                    shoulder_height = base_height * 0.2  # Fixed ratio to main peak
+                    shoulder_height = (
+                        base_height * 0.5
+                    )  # Fixed ratio to main peak (50%)
                     shoulder_sigma = base_sigma * 1.2  # Slightly wider than main peak
                     shoulder_gamma = base_gamma * 1.2  # Slightly wider than main peak
 
@@ -529,6 +534,15 @@ class PeakFitter(BaseIRHandler):
                     main_peak = lambda x_: self._voigt(x_, *popt_combined[:4])
                     second_peak = lambda x_: self._voigt(x_, *popt_combined[4:])
 
+                    # Enforce shoulder height constraint
+                    main_height = popt_combined[0]
+                    shoulder_height = popt_combined[4]
+                    if abs(shoulder_height) > 0.5 * abs(main_height):
+                        # Scale shoulder height to be exactly 50% of main peak height
+                        scale_factor = 0.5 * abs(main_height) / abs(shoulder_height)
+                        popt_combined[4] = shoulder_height * scale_factor
+                        second_peak = lambda x_: self._voigt(x_, *popt_combined[4:])
+
                     # Calculate residuals
                     residuals = calculate_residuals((main_peak, second_peak), x, y)
                     residual_sum = np.sum(np.abs(residuals))
@@ -544,7 +558,21 @@ class PeakFitter(BaseIRHandler):
                         print(
                             f"Fit successful with acceptable residuals after {attempt + 1} attempts"
                         )
-                        area = np.trapz(main_peak(x), x)
+                        area = np.trapz(np.abs(main_peak(x)), x)
+                        mean_residual = np.mean(np.abs(residuals))
+                        return (
+                            (main_peak, second_peak),
+                            area,
+                            has_shoulder,
+                            mean_residual,
+                        )
+
+                    # Early stopping if we find a really good fit
+                    if residual_sum < good_enough_threshold:
+                        print(
+                            f"Found excellent fit with residuals below threshold after {attempt + 1} attempts"
+                        )
+                        area = np.trapz(np.abs(main_peak(x)), x)
                         mean_residual = np.mean(np.abs(residuals))
                         return (
                             (main_peak, second_peak),
@@ -559,7 +587,7 @@ class PeakFitter(BaseIRHandler):
 
             else:
                 print(
-                    f"Attempt {attempt + 1}: Using single Voigt fit for {region_name} region"
+                    f"Attempt {attempt + 1}/20: Using single Voigt fit for {region_name} region"
                 )
 
                 # Check for initial guess from previous fit
@@ -604,7 +632,16 @@ class PeakFitter(BaseIRHandler):
                         print(
                             f"Fit successful with acceptable residuals after {attempt + 1} attempts"
                         )
-                        area = np.trapz(fit_func(x), x)
+                        area = np.trapz(np.abs(fit_func(x)), x)
+                        mean_residual = np.mean(np.abs(residuals))
+                        return fit_func, area, has_shoulder, mean_residual
+
+                    # Early stopping if we find a really good fit
+                    if residual_sum < good_enough_threshold:
+                        print(
+                            f"Found excellent fit with residuals below threshold after {attempt + 1} attempts"
+                        )
+                        area = np.trapz(np.abs(fit_func(x)), x)
                         mean_residual = np.mean(np.abs(residuals))
                         return fit_func, area, has_shoulder, mean_residual
 
@@ -614,7 +651,7 @@ class PeakFitter(BaseIRHandler):
 
         # If we get here, we didn't find a fit with acceptable residuals
         print(
-            f"Warning: Could not achieve residuals within -5% to 5% after 10 attempts"
+            f"Warning: Could not achieve residuals within -5% to 5% after 20 attempts"
         )
         print(f"Using best fit found (residual sum: {min_residual_sum:.4f})")
 
@@ -624,9 +661,9 @@ class PeakFitter(BaseIRHandler):
         # Calculate area and mean residual for the best fit
         if isinstance(best_fit, tuple):
             main_peak, _ = best_fit
-            area = np.trapz(main_peak(x), x)
+            area = np.trapz(np.abs(main_peak(x)), x)
         else:
-            area = np.trapz(best_fit(x), x)
+            area = np.trapz(np.abs(best_fit(x)), x)
 
         mean_residual = np.mean(np.abs(best_residuals))
         return best_fit, area, has_shoulder, mean_residual
@@ -766,14 +803,93 @@ class PeakFitter(BaseIRHandler):
         """Adds the calculated number of acid sites to the metadata.
 
         Args:
-            bronsted (float): Number of Brønsted acid sites in mmol/g
-            lewis (float): Number of Lewis acid sites in mmol/g
-            error_bronsted (float): Error in Brønsted acid sites in mmol/g
-            error_lewis (float): Error in Lewis acid sites in mmol/g
+            bronsted (float): Number of Brønsted acid sites in μmol/g
+            lewis (float): Number of Lewis acid sites in μmol/g
+            error_bronsted (float): Error in Brønsted acid sites in μmol/g
+            error_lewis (float): Error in Lewis acid sites in μmol/g
         """
-        self.metadata["number_acid_sites"] = {
-            "bronsted": {"value": bronsted, "error": error_bronsted},
-            "lewis": {"value": lewis, "error": error_lewis},
+        if "number_acid_sites" not in self.metadata:
+            self.metadata["number_acid_sites"] = {}
+
+        self.metadata["number_acid_sites"]["bronsted"] = {
+            "concentration": {
+                "value": bronsted,
+                "error": error_bronsted,
+                "unit": "μmol/g",
+            }
+        }
+        self.metadata["number_acid_sites"]["lewis"] = {
+            "concentration": {"value": lewis, "error": error_lewis, "unit": "μmol/g"}
+        }
+
+    def add_site_density(
+        self,
+        bronsted_density: float,
+        lewis_density: float,
+        error_bronsted_density: float,
+        error_lewis_density: float,
+    ) -> None:
+        """Adds the calculated acid site density to the metadata.
+
+        Args:
+            bronsted_density (float): Number of Brønsted acid sites per nm²
+            lewis_density (float): Number of Lewis acid sites per nm²
+            error_bronsted_density (float): Error in Brønsted acid site density per nm²
+            error_lewis_density (float): Error in Lewis acid site density per nm²
+        """
+        if "number_acid_sites" not in self.metadata:
+            self.metadata["number_acid_sites"] = {}
+
+        if "bronsted" not in self.metadata["number_acid_sites"]:
+            self.metadata["number_acid_sites"]["bronsted"] = {}
+
+        if "lewis" not in self.metadata["number_acid_sites"]:
+            self.metadata["number_acid_sites"]["lewis"] = {}
+
+        self.metadata["number_acid_sites"]["bronsted"]["surface_density"] = {
+            "value": bronsted_density,
+            "error": error_bronsted_density,
+            "unit": "sites/nm²",
+        }
+        self.metadata["number_acid_sites"]["lewis"]["surface_density"] = {
+            "value": lewis_density,
+            "error": error_lewis_density,
+            "unit": "sites/nm²",
+        }
+
+    def add_surface_concentration(
+        self,
+        bronsted_concentration: float,
+        lewis_concentration: float,
+        error_bronsted_concentration: float,
+        error_lewis_concentration: float,
+    ) -> None:
+        """Adds the calculated surface concentration to the metadata.
+
+        Args:
+            bronsted_concentration (float): Surface concentration of Brønsted acid sites in μmol/nm²
+            lewis_concentration (float): Surface concentration of Lewis acid sites in μmol/nm²
+            error_bronsted_concentration (float): Error in Brønsted surface concentration in μmol/nm²
+            error_lewis_concentration (float): Error in Lewis surface concentration in μmol/nm²
+        """
+        if "number_acid_sites" not in self.metadata:
+            self.metadata["number_acid_sites"] = {}
+
+        if "bronsted" not in self.metadata["number_acid_sites"]:
+            self.metadata["number_acid_sites"]["bronsted"] = {}
+
+        if "lewis" not in self.metadata["number_acid_sites"]:
+            self.metadata["number_acid_sites"]["lewis"] = {}
+
+        self.metadata["number_acid_sites"]["bronsted"]["surface_concentration"] = {
+            "value": bronsted_concentration,
+            "error": error_bronsted_concentration,
+            "unit": "μmol/nm²",
+        }
+        self.metadata["number_acid_sites"]["lewis"]["surface_concentration"] = {
+            "value": lewis_concentration,
+            "error": error_lewis_concentration,
+            "unit": "μmol/nm²",
         }
 
     def calc_n_sites(
@@ -943,8 +1059,8 @@ class PeakFitter(BaseIRHandler):
                 )
 
                 # Calculate site density in sites/nm²
-                bronsted_density = (n_bronsted / 1000) * 602.214076 / surface_area_nm2
-                lewis_density = (n_lewis / 1000) * 602.214076 / surface_area_nm2
+                bronsted_density = (n_bronsted * 6.022e20) / surface_area_nm2
+                lewis_density = (n_lewis * 6.022e20) / surface_area_nm2
 
                 # Calculate errors for site density
                 error_bronsted_density = bronsted_density * np.sqrt(
@@ -952,6 +1068,20 @@ class PeakFitter(BaseIRHandler):
                     + (error_surface_area_nm2 / surface_area_nm2) ** 2
                 )
                 error_lewis_density = lewis_density * np.sqrt(
+                    (error_lewis / n_lewis) ** 2
+                    + (error_surface_area_nm2 / surface_area_nm2) ** 2
+                )
+
+                # Calculate acid sites in μmol/nm²
+                bronsted_umol_nm2 = n_bronsted / surface_area_nm2  # Already in μmol
+                lewis_umol_nm2 = n_lewis / surface_area_nm2  # Already in μmol
+
+                # Calculate errors for μmol/nm²
+                error_bronsted_umol_nm2 = bronsted_umol_nm2 * np.sqrt(
+                    (error_bronsted / n_bronsted) ** 2
+                    + (error_surface_area_nm2 / surface_area_nm2) ** 2
+                )
+                error_lewis_umol_nm2 = lewis_umol_nm2 * np.sqrt(
                     (error_lewis / n_lewis) ** 2
                     + (error_surface_area_nm2 / surface_area_nm2) ** 2
                 )
@@ -964,12 +1094,32 @@ class PeakFitter(BaseIRHandler):
                     },
                     "lewis": {"value": lewis_density, "error": error_lewis_density},
                 }
+
+                # Store μmol/nm² results
+                self.results["umol_per_nm2"] = {
+                    "bronsted": {
+                        "value": bronsted_umol_nm2,
+                        "error": error_bronsted_umol_nm2,
+                    },
+                    "lewis": {
+                        "value": lewis_umol_nm2,
+                        "error": error_lewis_umol_nm2,
+                    },
+                }
+
                 print("\nStored site density in results:")
                 print(
                     f"Bronsted: {bronsted_density:.4f} ± {error_bronsted_density:.4f} sites/nm²"
                 )
                 print(
                     f"Lewis: {lewis_density:.4f} ± {error_lewis_density:.4f} sites/nm²"
+                )
+                print("\nStored μmol/nm² in results:")
+                print(
+                    f"Bronsted: {bronsted_umol_nm2:.4f} ± {error_bronsted_umol_nm2:.4f} μmol/nm²"
+                )
+                print(
+                    f"Lewis: {lewis_umol_nm2:.4f} ± {error_lewis_umol_nm2:.4f} μmol/nm²"
                 )
 
             print("\nResults:")
@@ -985,32 +1135,18 @@ class PeakFitter(BaseIRHandler):
                 print(
                     f"Lewis site density: {lewis_density:.4f} ± {error_lewis_density:.4f} sites/nm²"
                 )
+                print(
+                    f"Bronsted acid sites: {bronsted_umol_nm2:.4f} ± {error_bronsted_umol_nm2:.4f} μmol/nm²"
+                )
+                print(
+                    f"Lewis acid sites: {lewis_umol_nm2:.4f} ± {error_lewis_umol_nm2:.4f} μmol/nm²"
+                )
 
             return [n_bronsted, error_bronsted, n_lewis, error_lewis]
 
         except Exception as e:
             print(f"Error in calc_n_sites: {str(e)}")
             raise
-
-    def add_site_density(
-        self,
-        bronsted_density: float,
-        lewis_density: float,
-        error_bronsted_density: float,
-        error_lewis_density: float,
-    ) -> None:
-        """Adds the calculated acid site density to the metadata.
-
-        Args:
-            bronsted_density (float): Number of Brønsted acid sites per nm²
-            lewis_density (float): Number of Lewis acid sites per nm²
-            error_bronsted_density (float): Error in Brønsted acid site density per nm²
-            error_lewis_density (float): Error in Lewis acid site density per nm²
-        """
-        self.metadata["site_density"] = {
-            "bronsted": {"value": bronsted_density, "error": error_bronsted_density},
-            "lewis": {"value": lewis_density, "error": error_lewis_density},
-        }
 
     def extract_desorption_temperature(self, filename: str) -> Optional[int]:
         """Extracts the desorption temperature from the filename using regex.
@@ -1101,8 +1237,8 @@ class PeakFitter(BaseIRHandler):
 
                 # Add to total fit
                 mask = (self.x_array >= min(x)) & (self.x_array <= max(x))
-                total_fit[mask] += main_peak(self.x_array[mask]) + shoulder(
-                    self.x_array[mask]
+                total_fit[mask] += np.abs(main_peak(self.x_array[mask])) + np.abs(
+                    shoulder(self.x_array[mask])
                 )
 
                 # Plot individual residuals
@@ -1130,7 +1266,7 @@ class PeakFitter(BaseIRHandler):
 
                 # Add to total fit
                 mask = (self.x_array >= min(x)) & (self.x_array <= max(x))
-                total_fit[mask] += res["fit"](self.x_array[mask])
+                total_fit[mask] += np.abs(res["fit"](self.x_array[mask]))
 
                 # Plot individual residuals
                 mask_res = (self.x_array >= min(x)) & (self.x_array <= max(x))
@@ -1163,12 +1299,12 @@ class PeakFitter(BaseIRHandler):
         ax2.axhline(-0.025, color="gray", linestyle="--", linewidth=0.5)
 
         # Customize plot
-        ax1.set_xlabel("$\\nu$ / cm$^{-1}$")
+        ax1.set_xlabel("$\\tilde{\\nu}$ / cm$^{-1}$")
         ax1.set_ylabel("$A$ / a.u.")
         ax1.legend()
         ax1.invert_xaxis()
 
-        ax2.set_xlabel("$\\nu$ / cm$^{-1}$")
+        ax2.set_xlabel("$\\tilde{\\nu}$ / cm$^{-1}$")
         ax2.set_ylabel("Residual / %")
         ax2.invert_xaxis()
         ax2.set_ylim(-0.1, 0.1)
@@ -1255,8 +1391,9 @@ class PeakFitter(BaseIRHandler):
             "temperature_unit": "C",
             "peaks": [],
             "fits": [],
-            "number_acid_sites": None,
-            "site_density": None,
+            "bulk_concentration": None,  # μmol/g
+            "surface_density": None,  # sites/nm²
+            "surface_concentration": None,  # μmol/nm²
         }
 
         # Add peak data for each region
@@ -1330,25 +1467,70 @@ class PeakFitter(BaseIRHandler):
         if "number_acid_sites" in self.results:
             current_measurement["number_acid_sites"] = {
                 "bronsted": {
-                    "value": self.results["number_acid_sites"]["bronsted"]["value"],
-                    "error": self.results["number_acid_sites"]["bronsted"]["error"],
+                    "concentration": {
+                        "value": self.results["number_acid_sites"]["bronsted"]["value"],
+                        "error": self.results["number_acid_sites"]["bronsted"]["error"],
+                        "unit": "μmol/g",
+                    },
+                    "surface_density": {
+                        "value": (
+                            self.results["site_density"]["bronsted"]["value"]
+                            if "site_density" in self.results
+                            else None
+                        ),
+                        "error": (
+                            self.results["site_density"]["bronsted"]["error"]
+                            if "site_density" in self.results
+                            else None
+                        ),
+                        "unit": "sites/nm²",
+                    },
+                    "surface_concentration": {
+                        "value": (
+                            self.results["umol_per_nm2"]["bronsted"]["value"]
+                            if "umol_per_nm2" in self.results
+                            else None
+                        ),
+                        "error": (
+                            self.results["umol_per_nm2"]["bronsted"]["error"]
+                            if "umol_per_nm2" in self.results
+                            else None
+                        ),
+                        "unit": "μmol/nm²",
+                    },
                 },
                 "lewis": {
-                    "value": self.results["number_acid_sites"]["lewis"]["value"],
-                    "error": self.results["number_acid_sites"]["lewis"]["error"],
-                },
-            }
-
-        # Add site density if available
-        if "site_density" in self.results:
-            current_measurement["site_density"] = {
-                "bronsted": {
-                    "value": self.results["site_density"]["bronsted"]["value"],
-                    "error": self.results["site_density"]["bronsted"]["error"],
-                },
-                "lewis": {
-                    "value": self.results["site_density"]["lewis"]["value"],
-                    "error": self.results["site_density"]["lewis"]["error"],
+                    "concentration": {
+                        "value": self.results["number_acid_sites"]["lewis"]["value"],
+                        "error": self.results["number_acid_sites"]["lewis"]["error"],
+                        "unit": "μmol/g",
+                    },
+                    "surface_density": {
+                        "value": (
+                            self.results["site_density"]["lewis"]["value"]
+                            if "site_density" in self.results
+                            else None
+                        ),
+                        "error": (
+                            self.results["site_density"]["lewis"]["error"]
+                            if "site_density" in self.results
+                            else None
+                        ),
+                        "unit": "sites/nm²",
+                    },
+                    "surface_concentration": {
+                        "value": (
+                            self.results["umol_per_nm2"]["lewis"]["value"]
+                            if "umol_per_nm2" in self.results
+                            else None
+                        ),
+                        "error": (
+                            self.results["umol_per_nm2"]["lewis"]["error"]
+                            if "umol_per_nm2" in self.results
+                            else None
+                        ),
+                        "unit": "μmol/nm²",
+                    },
                 },
             }
 
@@ -1535,7 +1717,7 @@ class PeakFitter(BaseIRHandler):
                 )
 
         # Customize plot
-        ax.set_xlabel("$\\nu$ / cm$^{-1}$")
+        ax.set_xlabel("$\\tilde{\\nu}$ / cm$^{-1}$")
         ax.set_ylabel("$A$ / a.u.")
         ax.set_xlim(1560, 1400)
         ax.legend(loc="upper left")

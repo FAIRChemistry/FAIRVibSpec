@@ -106,8 +106,6 @@ def validate_fit_parameters(params: Dict[str, float], region_name: str) -> None:
         )
     if params["sigma"] < 0 or params["gamma"] < 0:
         raise ValueError(f"Negative width parameters detected in {region_name} fit")
-    if params["height"] < 0:
-        raise ValueError(f"Negative height detected in {region_name} fit")
 
 
 def validate_surface_area(
