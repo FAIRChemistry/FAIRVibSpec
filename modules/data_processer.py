@@ -100,15 +100,25 @@ class IRDataHandler(BaseIRHandler):
         """
         return "IRDataHandler"
 
-    def save_json(self, json_filename: Union[str, Path]) -> None:
+    def save_json(
+        self,
+        json_filename: Union[str, Path],
+        path_to_directory: Union[str, Path] = None,
+        silent: bool = False,
+    ) -> None:
         """Save all metadata and results to a JSON file.
 
         Args:
             json_filename (Union[str, Path]): Path to the output JSON file
         """
-        with open(json_filename, "w") as json_file:
+        if not path_to_directory:
+            path_to_directory = self.path
+        with open(path_to_directory / json_filename, "w") as json_file:
             json.dump(self.metadata, json_file, indent=4)
-        print(f"Data saved to {json_filename}")
+        if not silent:
+            print(
+                f"Data saved to '{Path(path_to_directory / json_filename).relative_to(Path.cwd())}'."
+            )
 
     def add_sample_metadata(
         self,
@@ -198,7 +208,9 @@ class IRDataHandler(BaseIRHandler):
         if surface_area is not None:
             self.metadata["sample"]["surface_area"] = {
                 "value": surface_area,
-                "error": error_surface_area if error_surface_area is not None else 0,
+                "error": error_surface_area
+                if error_surface_area is not None
+                else 0,
                 "unit": surface_area_unit,
             }
 
@@ -268,10 +280,14 @@ class IRDataHandler(BaseIRHandler):
                 pass
             else:
                 self.bckgrnd_file["wavenumber"] = (
-                    self.bckgrnd_file["wavenumber"].str.replace(",", ".").astype(float)
+                    self.bckgrnd_file["wavenumber"]
+                    .str.replace(",", ".")
+                    .astype(float)
                 )
                 self.bckgrnd_file["absorbance"] = (
-                    self.bckgrnd_file["absorbance"].str.replace(",", ".").astype(float)
+                    self.bckgrnd_file["absorbance"]
+                    .str.replace(",", ".")
+                    .astype(float)
                 )
         return self.bckgrnd_file
 
@@ -302,10 +318,14 @@ class IRDataHandler(BaseIRHandler):
                     pass
                 else:
                     sample_file["wavenumber"] = (
-                        sample_file["wavenumber"].str.replace(",", ".").astype(float)
+                        sample_file["wavenumber"]
+                        .str.replace(",", ".")
+                        .astype(float)
                     )
                     sample_file["absorbance"] = (
-                        sample_file["absorbance"].str.replace(",", ".").astype(float)
+                        sample_file["absorbance"]
+                        .str.replace(",", ".")
+                        .astype(float)
                     )
                 self.sample_files.append(sample_file)
         return self.sample_files
@@ -368,7 +388,9 @@ class IRDataHandler(BaseIRHandler):
                 closest_wavenumber_index, "absorbance"
             ]
 
-            corrected_absorbance = background_corrected_absorbance - baseline_absorbance
+            corrected_absorbance = (
+                background_corrected_absorbance - baseline_absorbance
+            )
 
             corrected_data = pd.DataFrame(
                 {
@@ -383,13 +405,17 @@ class IRDataHandler(BaseIRHandler):
             ]
 
             filtered_files = [
-                file for file in self.input_files if not file.endswith("_background")
+                file
+                for file in self.input_files
+                if not file.endswith("_background")
             ]
 
             self.add_measurement_metadata(
                 data_file=filtered_files[index],
                 measurement_type="sample",
-                temperature=self.extract_desorption_temperature(filtered_files[index]),
+                temperature=self.extract_desorption_temperature(
+                    filtered_files[index]
+                ),
                 background_file=(
                     background_file if background_file else "background_file"
                 ),
@@ -440,7 +466,7 @@ class IRDataHandler(BaseIRHandler):
             return int(match.group(1))
         return None
 
-    def get_plot(self) -> None:
+    def get_plot(self, save: bool = True) -> None:
         """Generate a plot of all measurements in a single graph.
 
         The plot shows all measurements with a color gradient based on temperature,
@@ -451,7 +477,9 @@ class IRDataHandler(BaseIRHandler):
         cmap = mpl.cm.nipy_spectral.reversed()
 
         filtered_files = [
-            file for file in self.input_files if not file.endswith("_background")
+            file
+            for file in self.input_files
+            if not file.endswith("_background")
         ]
 
         temp_file_pairs = [
@@ -468,7 +496,9 @@ class IRDataHandler(BaseIRHandler):
         ax.set_xlabel("$\\tilde{\\nu}$ / cm$^{-1}$")
         ax.set_ylabel("$A$ / a.u.")
 
-        for index, (temperature, filename, measurement) in enumerate(temp_file_pairs):
+        for index, (temperature, filename, measurement) in enumerate(
+            temp_file_pairs
+        ):
             if temperature is not None:
                 name = f"{temperature} °C"
                 print(f"Adding measurement {name} to figure.")
@@ -482,20 +512,32 @@ class IRDataHandler(BaseIRHandler):
 
         plt.tight_layout()
         plt.legend()
-        plt.savefig(self.folder + ".png", dpi=400)
+        if save:
+            plt.savefig(self.path / (str(self.folder) + ".png"), dpi=400)
         plt.show()
 
-    def save_data_to_csv(self) -> None:
-        """Export corrected data to CSV files.
+    def save_data_to_csv(
+        self, output_path: str | Path = None, silent: bool = False
+    ) -> None:
+        """Export corrected data to CSV files. Creates a CSV file for
+        each corrected measurement in the input directory.
 
-        Creates a CSV file for each corrected measurement in the input directory.
+        Args:
+            output_path (str | Path, optional): Path to save the CSV
+              files. If not provided, the CSV files will be saved in the
+              input directory.
         """
         self.get_data()
 
         for index, dataframe in enumerate(self.sample_data_corr):
             file_name = list(self.input_files)[index]
-            output_path = self.path / f"{file_name}_corr.csv"
+            if not output_path:
+                output_path = self.path / f"{file_name}_corr.csv"
             dataframe.to_csv(output_path)
+            if not silent:
+                print(
+                    f"Saved '{file_name}' to '{output_path.relative_to(Path.cwd())}'."
+                )
 
     def extract_data(self, index: int) -> Tuple[pd.Series, pd.Series]:
         """Extract and validate data from a specific file.
