@@ -104,13 +104,18 @@ def save_results_to_txt(
 
 
 def load_and_validate_data(file_path: Union[str, Path]) -> pd.DataFrame:
-    """Load and validate data from a CSV file.
+    """Load and validate IR spectroscopy data from a CSV file.
+
+    This function ensures that the loaded data contains the required columns
+    and handles any missing values.
 
     Args:
-        file_path (Union[str, Path]): Path to the CSV file
+        file_path (Union[str, Path]): Path to the CSV file containing IR data
 
     Returns:
-        pd.DataFrame: DataFrame containing the validated data
+        pd.DataFrame: DataFrame containing validated data with columns:
+            - wavenumber: Wavenumber values in cm^-1
+            - absorbance: Absorbance values
 
     Raises:
         ValueError: If required columns are missing
@@ -119,28 +124,7 @@ def load_and_validate_data(file_path: Union[str, Path]) -> pd.DataFrame:
     Example:
         >>> df = load_and_validate_data("data.csv")
     """
-    # Try reading with headers first
-    try:
-        df = pd.read_csv(file_path)
-        # Check if the file has headers
-        if not all(col in df.columns for col in ["wavenumber", "absorbance"]):
-            # If not, read again without headers
-            df = pd.read_csv(
-                file_path,
-                sep="\t",
-                header=None,
-                names=["wavenumber", "absorbance"],
-                engine="python",
-            )
-    except Exception:
-        # If that fails, try reading without headers
-        df = pd.read_csv(
-            file_path,
-            sep="\t",
-            header=None,
-            names=["wavenumber", "absorbance"],
-            engine="python",
-        )
+    df = pd.read_csv(file_path)
 
     # Basic validation
     required_columns = ["wavenumber", "absorbance"]

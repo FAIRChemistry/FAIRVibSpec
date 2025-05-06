@@ -55,29 +55,24 @@ class IRDataHandler(BaseIRHandler):
         folder: str,
         decimal: str,
     ) -> None:
-        """Initialize the IRDataHandler.
+        """Initialize the IR data handler.
 
         Args:
-            path_to_directory (Union[str, Path]): Path to the directory containing the data files
-            folder (str): Name of the folder containing the data files
-            decimal (str): Decimal separator used in the data files
+            path_to_directory (Union[str, Path]): Path to the directory containing IR data files
+            folder (str): Name of the folder containing the data
+            decimal (str): Decimal separator used in the data files ('.' or ',')
+
+        Raises:
+            ValueError: If the decimal separator is not '.' or ','
         """
         super().__init__(path_to_directory, folder)
-        self.path_to_directory = path_to_directory
-        self.decimal = decimal
-        self.input_files = []
-        self.sample_data = []
-        self.sample_data_corr = []
-        self.background_data = None
+        self.decimal = validate_decimal_separator(decimal)
 
         # Initialize input files as a dictionary of Path objects
-        # Exclude files that end with '_corr' or '_background_corr'
         self.input_files = {
             file.stem: file
             for file in self.path.glob(pattern="*.CSV")
             if file.is_file()
-            and not file.stem.endswith("_corr")
-            and not file.stem.endswith("_background_corr")
         }
 
         # Initialize data storage
@@ -106,21 +101,14 @@ class IRDataHandler(BaseIRHandler):
         return "IRDataHandler"
 
     def save_json(self, json_filename: Union[str, Path]) -> None:
-        """Save all metadata and results to a JSON file in the fits_plots folder.
+        """Save all metadata and results to a JSON file.
 
         Args:
-            json_filename (Union[str, Path]): Name of the output JSON file
+            json_filename (Union[str, Path]): Path to the output JSON file
         """
-        # Create fits_plots directory if it doesn't exist
-        fits_plots_dir = Path(self.path_to_directory) / "fits_plots"
-        fits_plots_dir.mkdir(exist_ok=True)
-
-        # Create the full path for the JSON file
-        json_path = fits_plots_dir / json_filename
-
-        with open(json_path, "w") as json_file:
+        with open(json_filename, "w") as json_file:
             json.dump(self.metadata, json_file, indent=4)
-        print(f"Data saved to {json_path}")
+        print(f"Data saved to {json_filename}")
 
     def add_sample_metadata(
         self,
@@ -331,7 +319,6 @@ class IRDataHandler(BaseIRHandler):
         1. Background subtraction
         2. Baseline correction (using absorption at 1525 cm^-1)
         3. Truncating to the wavenumber range of interest (1400-1560 cm^-1)
-        4. Saves corrected data to CSV files in the corr subdirectory
 
         Args:
             list_of_df (Optional[List[pd.DataFrame]]): List of DataFrames
@@ -353,11 +340,6 @@ class IRDataHandler(BaseIRHandler):
 
         self.sample_data_corr = []
 
-        # Create corr directory if it doesn't exist
-        corr_dir = Path(self.path_to_directory) / "corr"
-        corr_dir.mkdir(exist_ok=True)
-
-        # Get background data
         background_absorbance = self.bckgrnd_file["absorbance"]
 
         # Find the background file name
@@ -367,88 +349,54 @@ class IRDataHandler(BaseIRHandler):
                 background_file = file
                 break
 
-        if not background_file:
-            raise ValueError("No background file found in the input files")
-
-        # Filter out background files from processing
-        sample_files = [
-            file for file in self.input_files if not file.endswith("_background")
-        ]
-
-        if not sample_files:
-            raise ValueError("No sample files found to process")
-
-        # Process each sample file individually
         for index, data_set in enumerate(list_of_df):
-            # Skip if this is a background file
-            if sample_files[index].endswith("_background"):
-                continue
+            background_corrected_absorbance = (
+                data_set["absorbance"] - background_absorbance
+            )
 
-            try:
-                # Background correction
-                background_corrected_absorbance = (
-                    data_set["absorbance"] - background_absorbance
-                )
+            background_corrected_data = pd.DataFrame(
+                {
+                    "wavenumber": data_set["wavenumber"],
+                    "absorbance": background_corrected_absorbance,
+                }
+            )
 
-                background_corrected_data = pd.DataFrame(
-                    {
-                        "wavenumber": data_set["wavenumber"],
-                        "absorbance": background_corrected_absorbance,
-                    }
-                )
+            closest_wavenumber_index = (
+                (background_corrected_data["wavenumber"] - 1525).abs().idxmin()
+            )
+            baseline_absorbance = background_corrected_data.loc[
+                closest_wavenumber_index, "absorbance"
+            ]
 
-                # Baseline correction
-                closest_wavenumber_index = (
-                    (background_corrected_data["wavenumber"] - 1525).abs().idxmin()
-                )
-                baseline_absorbance = background_corrected_data.loc[
-                    closest_wavenumber_index, "absorbance"
-                ]
+            corrected_absorbance = background_corrected_absorbance - baseline_absorbance
 
-                corrected_absorbance = (
-                    background_corrected_absorbance - baseline_absorbance
-                )
+            corrected_data = pd.DataFrame(
+                {
+                    "wavenumber": data_set["wavenumber"],
+                    "absorbance": corrected_absorbance,
+                }
+            )
 
-                corrected_data = pd.DataFrame(
-                    {
-                        "wavenumber": data_set["wavenumber"],
-                        "absorbance": corrected_absorbance,
-                    }
-                )
+            sample_data_corr = corrected_data[
+                (corrected_data["wavenumber"] >= lower_limit)
+                & (corrected_data["wavenumber"] <= upper_limit)
+            ]
 
-                # Truncate to wavenumber range
-                sample_data_corr = corrected_data[
-                    (corrected_data["wavenumber"] >= lower_limit)
-                    & (corrected_data["wavenumber"] <= upper_limit)
-                ]
+            filtered_files = [
+                file for file in self.input_files if not file.endswith("_background")
+            ]
 
-                # Add metadata for this specific sample
-                self.add_measurement_metadata(
-                    data_file=sample_files[index],
-                    measurement_type="sample",
-                    temperature=self.extract_desorption_temperature(
-                        sample_files[index]
-                    ),
-                    background_file=background_file,
-                    baseline=baseline_absorbance,
-                )
+            self.add_measurement_metadata(
+                data_file=filtered_files[index],
+                measurement_type="sample",
+                temperature=self.extract_desorption_temperature(filtered_files[index]),
+                background_file=(
+                    background_file if background_file else "background_file"
+                ),
+                baseline=baseline_absorbance,
+            )
 
-                self.sample_data_corr.append(sample_data_corr)
-
-                # Save the corrected data to CSV
-                output_filename = (
-                    corr_dir / f"{Path(sample_files[index]).stem}_corr.csv"
-                )
-                sample_data_corr.to_csv(
-                    output_filename, sep=",", index=True, header=True
-                )
-                print(f"Saved corrected data to {output_filename.stem}")
-
-            except Exception as e:
-                raise ValueError(
-                    f"Error processing file {sample_files[index]}: {str(e)}"
-                )
-
+            self.sample_data_corr.append(sample_data_corr)
         return self.sample_data_corr
 
     def get_control_plot(self, index: int) -> None:
@@ -487,7 +435,7 @@ class IRDataHandler(BaseIRHandler):
         Returns:
             Optional[int]: Extracted temperature in Celsius, or None if not found
         """
-        match = re.search(r"min-(\d+)C-Pyr-des", filename)
+        match = re.search(r"\d+C.*?(\d+)C", filename)
         if match:
             return int(match.group(1))
         return None
@@ -496,25 +444,19 @@ class IRDataHandler(BaseIRHandler):
         """Generate a plot of all measurements in a single graph.
 
         The plot shows all measurements with a color gradient based on temperature,
-        sorted by desorption temperature. The plot is saved as a PNG file in the fits_plots folder.
+        sorted by desorption temperature. The plot is saved as a PNG file.
         """
         self.get_data()
 
-        # Create fits_plots directory if it doesn't exist
-        fits_plots_dir = Path(self.path_to_directory) / "fits_plots"
-        fits_plots_dir.mkdir(exist_ok=True)
-
         cmap = mpl.cm.nipy_spectral.reversed()
 
-        # Filter out background files and get sample files
-        sample_files = [
+        filtered_files = [
             file for file in self.input_files if not file.endswith("_background")
         ]
 
-        # Create temperature-file-dataframe pairs and sort by temperature
         temp_file_pairs = [
             (self.extract_desorption_temperature(file), file, df)
-            for file, df in zip(sample_files, self.sample_data_corr)
+            for file, df in zip(filtered_files, self.sample_data_corr)
         ]
         temp_file_pairs.sort(key=lambda x: x[0])
 
@@ -530,17 +472,30 @@ class IRDataHandler(BaseIRHandler):
             if temperature is not None:
                 name = f"{temperature} °C"
                 print(f"Adding measurement {name} to figure.")
-                ax.plot(
-                    measurement["wavenumber"].tolist(),
-                    measurement["absorbance"].tolist(),
-                    color=cmap(index / float(n_meas)),
-                    label=name,
-                )
+
+            ax.plot(
+                measurement["wavenumber"].tolist(),
+                measurement["absorbance"].tolist(),
+                color=cmap(index / float(n_meas)),
+                label=name,
+            )
 
         plt.tight_layout()
-        plt.legend(loc="upper right", bbox_to_anchor=(0.98, 0.98))
-        plt.savefig(fits_plots_dir / f"{self.folder}.png", dpi=400)
+        plt.legend()
+        plt.savefig(self.folder + ".png", dpi=400)
         plt.show()
+
+    def save_data_to_csv(self) -> None:
+        """Export corrected data to CSV files.
+
+        Creates a CSV file for each corrected measurement in the input directory.
+        """
+        self.get_data()
+
+        for index, dataframe in enumerate(self.sample_data_corr):
+            file_name = list(self.input_files)[index]
+            output_path = self.path / f"{file_name}_corr.csv"
+            dataframe.to_csv(output_path)
 
     def extract_data(self, index: int) -> Tuple[pd.Series, pd.Series]:
         """Extract and validate data from a specific file.
@@ -570,32 +525,6 @@ class IRDataHandler(BaseIRHandler):
         )
 
         return df["wavenumber"], df["absorbance"]
-
-    def recalculate_data(self) -> None:
-        """Recalculate all data after updating sample metadata.
-
-        This method should be called after updating the sample metadata to ensure
-        all calculations are performed with the new values. It will:
-        1. Clear existing calculated data
-        2. Reprocess all measurements
-        3. Update the plots and saved files
-        """
-        print("\nRecalculating data with updated metadata...")
-
-        # Clear existing calculated data
-        self.sample_data_corr = []
-        self.sample_files = []
-
-        # Reprocess all measurements
-        self.get_data()
-
-        # Update plots
-        self.get_plot()
-
-        # Save updated data
-        self.save_json("updated_data.json")
-
-        print("Recalculation complete. All data has been updated with new metadata.")
 
 
 if __name__ == "__main__":
