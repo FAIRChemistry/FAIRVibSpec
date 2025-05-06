@@ -125,7 +125,9 @@ class PeakFitter(BaseIRHandler):
         """
         super().__init__(path_to_directory, folder)
         self.input_files = {
-            file.stem: file for file in self.path.glob("*.csv") if file.is_file()
+            file.stem: file
+            for file in self.path.glob("*.csv")
+            if file.is_file()
         }
 
         # Initialize data arrays
@@ -254,7 +256,9 @@ class PeakFitter(BaseIRHandler):
         """
 
         z = (x - center + 1j * gamma) / (sigma * np.sqrt(2))
-        return amp * np.real(scipy.special.wofz(z)) / (sigma * np.sqrt(2 * np.pi))
+        return (
+            amp * np.real(scipy.special.wofz(z)) / (sigma * np.sqrt(2 * np.pi))
+        )
 
     def _double_voigt(
         self,
@@ -341,7 +345,9 @@ class PeakFitter(BaseIRHandler):
 
         if len(y_range) < 5:
             if verbose:
-                print(f"Not enough data points in range {range_min}-{range_max}")
+                print(
+                    f"Not enough data points in range {range_min}-{range_max}"
+                )
             return None
 
         # Find peaks with improved parameters
@@ -437,7 +443,9 @@ class PeakFitter(BaseIRHandler):
 
         peak_data = self._find_peaks_in_range(min(x), max(x), verbose=True)
         if peak_data is None:
-            raise ValueError(f"No peak found in range for {region_name} region")
+            raise ValueError(
+                f"No peak found in range for {region_name} region"
+            )
 
         has_shoulder = self.forced_shoulders.get(region_name, False)
 
@@ -501,23 +509,36 @@ class PeakFitter(BaseIRHandler):
                     ]
 
                     # Better initial guess for shoulder peak
-                    shoulder_center = base_center + 15  # Fixed offset from main peak
+                    shoulder_center = (
+                        base_center + 15
+                    )  # Fixed offset from main peak
                     shoulder_height = (
                         base_height * 0.5
                     )  # Fixed ratio to main peak (50%)
-                    shoulder_sigma = base_sigma * 1.2  # Slightly wider than main peak
-                    shoulder_gamma = base_gamma * 1.2  # Slightly wider than main peak
+                    shoulder_sigma = (
+                        base_sigma * 1.2
+                    )  # Slightly wider than main peak
+                    shoulder_gamma = (
+                        base_gamma * 1.2
+                    )  # Slightly wider than main peak
 
                     p0_shoulder = [
-                        shoulder_height * (1 + 0.1 * (np.random.random() - 0.5)),
-                        shoulder_center * (1 + 0.01 * (np.random.random() - 0.5)),
-                        shoulder_sigma * (1 + 0.1 * (np.random.random() - 0.5)),
-                        shoulder_gamma * (1 + 0.1 * (np.random.random() - 0.5)),
+                        shoulder_height
+                        * (1 + 0.1 * (np.random.random() - 0.5)),
+                        shoulder_center
+                        * (1 + 0.01 * (np.random.random() - 0.5)),
+                        shoulder_sigma
+                        * (1 + 0.1 * (np.random.random() - 0.5)),
+                        shoulder_gamma
+                        * (1 + 0.1 * (np.random.random() - 0.5)),
                     ]
 
                 # Combine parameters for double Voigt fit
                 p0_combined = np.concatenate([p0_main, p0_shoulder])
-                bounds_combined = (bounds[0] + bounds[0], bounds[1] + bounds[1])
+                bounds_combined = (
+                    bounds[0] + bounds[0],
+                    bounds[1] + bounds[1],
+                )
 
                 try:
                     # Fit both Voigts together with bounds
@@ -532,19 +553,27 @@ class PeakFitter(BaseIRHandler):
 
                     # Create separate functions for main peak and second peak
                     main_peak = lambda x_: self._voigt(x_, *popt_combined[:4])
-                    second_peak = lambda x_: self._voigt(x_, *popt_combined[4:])
+                    second_peak = lambda x_: self._voigt(
+                        x_, *popt_combined[4:]
+                    )
 
                     # Enforce shoulder height constraint
                     main_height = popt_combined[0]
                     shoulder_height = popt_combined[4]
                     if abs(shoulder_height) > 0.5 * abs(main_height):
                         # Scale shoulder height to be exactly 50% of main peak height
-                        scale_factor = 0.5 * abs(main_height) / abs(shoulder_height)
+                        scale_factor = (
+                            0.5 * abs(main_height) / abs(shoulder_height)
+                        )
                         popt_combined[4] = shoulder_height * scale_factor
-                        second_peak = lambda x_: self._voigt(x_, *popt_combined[4:])
+                        second_peak = lambda x_: self._voigt(
+                            x_, *popt_combined[4:]
+                        )
 
                     # Calculate residuals
-                    residuals = calculate_residuals((main_peak, second_peak), x, y)
+                    residuals = calculate_residuals(
+                        (main_peak, second_peak), x, y
+                    )
                     residual_sum = np.sum(np.abs(residuals))
 
                     # Update best fit if this is better
@@ -595,7 +624,9 @@ class PeakFitter(BaseIRHandler):
                     region_name in self.config.constraints
                     and "initial_guess" in self.config.constraints[region_name]
                 ):
-                    p0 = self.config.constraints[region_name]["initial_guess"]["main"]
+                    p0 = self.config.constraints[region_name]["initial_guess"][
+                        "main"
+                    ]
                 else:
                     # Use base parameters with small random variations
                     # For Voigt: [amp, center, sigma, gamma]
@@ -715,7 +746,9 @@ class PeakFitter(BaseIRHandler):
 
         # Preserve existing metadata if it exists
         existing_metadata = (
-            self.results.get("sample_metadata") if hasattr(self, "results") else None
+            self.results.get("sample_metadata")
+            if hasattr(self, "results")
+            else None
         )
         self.results = {}
         if existing_metadata:
@@ -798,7 +831,11 @@ class PeakFitter(BaseIRHandler):
             print("No results were generated")
 
     def add_acid_sites(
-        self, bronsted: float, lewis: float, error_bronsted: float, error_lewis: float
+        self,
+        bronsted: float,
+        lewis: float,
+        error_bronsted: float,
+        error_lewis: float,
     ) -> None:
         """Adds the calculated number of acid sites to the metadata.
 
@@ -819,7 +856,11 @@ class PeakFitter(BaseIRHandler):
             }
         }
         self.metadata["number_acid_sites"]["lewis"] = {
-            "concentration": {"value": lewis, "error": error_lewis, "unit": "μmol/g"}
+            "concentration": {
+                "value": lewis,
+                "error": error_lewis,
+                "unit": "μmol/g",
+            }
         }
 
     def add_site_density(
@@ -881,12 +922,16 @@ class PeakFitter(BaseIRHandler):
         if "lewis" not in self.metadata["number_acid_sites"]:
             self.metadata["number_acid_sites"]["lewis"] = {}
 
-        self.metadata["number_acid_sites"]["bronsted"]["surface_concentration"] = {
+        self.metadata["number_acid_sites"]["bronsted"][
+            "surface_concentration"
+        ] = {
             "value": bronsted_concentration,
             "error": error_bronsted_concentration,
             "unit": "μmol/nm²",
         }
-        self.metadata["number_acid_sites"]["lewis"]["surface_concentration"] = {
+        self.metadata["number_acid_sites"]["lewis"][
+            "surface_concentration"
+        ] = {
             "value": lewis_concentration,
             "error": error_lewis_concentration,
             "unit": "μmol/nm²",
@@ -951,7 +996,9 @@ class PeakFitter(BaseIRHandler):
 
             # Check if we have the required data
             if not hasattr(self, "results") or not self.results:
-                raise ValueError("No analysis results available. Run analyze() first.")
+                raise ValueError(
+                    "No analysis results available. Run analyze() first."
+                )
 
             if "sample_metadata" not in self.results:
                 raise ValueError(
@@ -979,8 +1026,12 @@ class PeakFitter(BaseIRHandler):
             )
 
             # Get error values from metadata if not provided
-            error_sample_length = error_sample_length or metadata["length"]["error"]
-            error_sample_width = error_sample_width or metadata["width"]["error"]
+            error_sample_length = (
+                error_sample_length or metadata["length"]["error"]
+            )
+            error_sample_width = (
+                error_sample_width or metadata["width"]["error"]
+            )
             error_sample_mass = error_sample_mass or metadata["mass"]["error"]
 
             # Get surface area from metadata if available and not provided
@@ -1012,11 +1063,17 @@ class PeakFitter(BaseIRHandler):
             bronsted_area = self.results["bronsted"]["area"]
 
             print(f"\nUsing values:")
-            print(f"Sample area: {sample_area:.4f} ± {error_sample_area:.4f} cm²")
-            print(f"Sample mass: {sample_mass:.4f} ± {error_sample_mass:.4f} g")
+            print(
+                f"Sample area: {sample_area:.4f} ± {error_sample_area:.4f} cm²"
+            )
+            print(
+                f"Sample mass: {sample_mass:.4f} ± {error_sample_mass:.4f} g"
+            )
             print(f"Lewis area: {lewis_area:.4f}")
             print(f"Bronsted area: {bronsted_area:.4f}")
-            print(f"Extinction coefficient (Lewis): {extinction_coefficient_lewis:.4f}")
+            print(
+                f"Extinction coefficient (Lewis): {extinction_coefficient_lewis:.4f}"
+            )
             print(
                 f"Extinction coefficient (Bronsted): {extinction_coefficient_bronsted:.4f}"
             )
@@ -1028,7 +1085,9 @@ class PeakFitter(BaseIRHandler):
                 / (sample_mass * extinction_coefficient_bronsted)
             )
             n_lewis = (
-                lewis_area * sample_area / (sample_mass * extinction_coefficient_lewis)
+                lewis_area
+                * sample_area
+                / (sample_mass * extinction_coefficient_lewis)
             )
 
             # Calculate errors
@@ -1073,7 +1132,9 @@ class PeakFitter(BaseIRHandler):
                 )
 
                 # Calculate acid sites in μmol/nm²
-                bronsted_umol_nm2 = n_bronsted / surface_area_nm2  # Already in μmol
+                bronsted_umol_nm2 = (
+                    n_bronsted / surface_area_nm2
+                )  # Already in μmol
                 lewis_umol_nm2 = n_lewis / surface_area_nm2  # Already in μmol
 
                 # Calculate errors for μmol/nm²
@@ -1092,7 +1153,10 @@ class PeakFitter(BaseIRHandler):
                         "value": bronsted_density,
                         "error": error_bronsted_density,
                     },
-                    "lewis": {"value": lewis_density, "error": error_lewis_density},
+                    "lewis": {
+                        "value": lewis_density,
+                        "error": error_lewis_density,
+                    },
                 }
 
                 # Store μmol/nm² results
@@ -1126,7 +1190,9 @@ class PeakFitter(BaseIRHandler):
             print(
                 f"Bronsted acid sites: {n_bronsted:.4f} ± {error_bronsted:.4f} μmol/g"
             )
-            print(f"Lewis acid sites: {n_lewis:.4f} ± {error_lewis:.4f} μmol/g")
+            print(
+                f"Lewis acid sites: {n_lewis:.4f} ± {error_lewis:.4f} μmol/g"
+            )
 
             if surface_area is not None:
                 print(
@@ -1168,7 +1234,9 @@ class PeakFitter(BaseIRHandler):
         except (AttributeError, ValueError, TypeError):
             return None
 
-    def plot_results(self, name: str = None, index: int = None) -> None:
+    def plot_results(
+        self, name: str = None, index: int = None, save: bool = True
+    ) -> None:
         """Plot the analysis results.
 
         Args:
@@ -1237,14 +1305,15 @@ class PeakFitter(BaseIRHandler):
 
                 # Add to total fit
                 mask = (self.x_array >= min(x)) & (self.x_array <= max(x))
-                total_fit[mask] += np.abs(main_peak(self.x_array[mask])) + np.abs(
-                    shoulder(self.x_array[mask])
-                )
+                total_fit[mask] += np.abs(
+                    main_peak(self.x_array[mask])
+                ) + np.abs(shoulder(self.x_array[mask]))
 
                 # Plot individual residuals
                 mask_res = (self.x_array >= min(x)) & (self.x_array <= max(x))
                 residuals_individual = self.y_array[mask_res] - (
-                    main_peak(self.x_array[mask_res]) + shoulder(self.x_array[mask_res])
+                    main_peak(self.x_array[mask_res])
+                    + shoulder(self.x_array[mask_res])
                 )
                 ax2.plot(
                     self.x_array[mask_res],
@@ -1331,8 +1400,8 @@ class PeakFitter(BaseIRHandler):
 
         if name is None:
             name = self.folder
-
-        plt.savefig(f"{name}_{temperature}C_fit.png", dpi=400)
+        if save:
+            plt.savefig(self.path / f"{name}_{temperature}C_fit.png", dpi=400)
         plt.show()
 
     def save_json(self, json_filename: str) -> None:
@@ -1341,14 +1410,21 @@ class PeakFitter(BaseIRHandler):
             json.dump(self.metadata, json_file, indent=4)
         print(f"Data saved to {json_filename}")
 
-    def update_json(self, json_filename: Union[str, Path], index: int) -> None:
+    def update_json(
+        self,
+        json_filename: Union[str, Path],
+        index: int,
+        path_to_directory: Union[str, Path] = None,
+    ) -> None:
         """Update an existing JSON file with new measurement data.
 
         Args:
             json_filename: Path to the JSON file
             index: Index of the measurement to update
         """
-        json_path = Path(json_filename)
+        if not path_to_directory:
+            path_to_directory = self.path
+        json_path = path_to_directory / json_filename
         try:
             with json_path.open("r") as f:
                 data = json.load(f)
@@ -1386,7 +1462,9 @@ class PeakFitter(BaseIRHandler):
                 else "background_file"
             ),
             "baseline": (
-                existing_measurement["baseline"] if existing_measurement else 0.0
+                existing_measurement["baseline"]
+                if existing_measurement
+                else 0.0
             ),
             "temperature_unit": "C",
             "peaks": [],
@@ -1435,17 +1513,33 @@ class PeakFitter(BaseIRHandler):
                             {
                                 "region": region,
                                 "main_peak": {
-                                    "height": main_peak.__closure__[0].cell_contents[0],
-                                    "center": main_peak.__closure__[0].cell_contents[1],
-                                    "sigma": main_peak.__closure__[0].cell_contents[2],
-                                    "gamma": main_peak.__closure__[0].cell_contents[3],
+                                    "height": main_peak.__closure__[
+                                        0
+                                    ].cell_contents[0],
+                                    "center": main_peak.__closure__[
+                                        0
+                                    ].cell_contents[1],
+                                    "sigma": main_peak.__closure__[
+                                        0
+                                    ].cell_contents[2],
+                                    "gamma": main_peak.__closure__[
+                                        0
+                                    ].cell_contents[3],
                                     "area": self.results[region]["area"],
                                 },
                                 "shoulder": {
-                                    "height": shoulder.__closure__[0].cell_contents[0],
-                                    "center": shoulder.__closure__[0].cell_contents[1],
-                                    "sigma": shoulder.__closure__[0].cell_contents[2],
-                                    "gamma": shoulder.__closure__[0].cell_contents[3],
+                                    "height": shoulder.__closure__[
+                                        0
+                                    ].cell_contents[0],
+                                    "center": shoulder.__closure__[
+                                        0
+                                    ].cell_contents[1],
+                                    "sigma": shoulder.__closure__[
+                                        0
+                                    ].cell_contents[2],
+                                    "gamma": shoulder.__closure__[
+                                        0
+                                    ].cell_contents[3],
                                 },
                             }
                         )
@@ -1454,10 +1548,18 @@ class PeakFitter(BaseIRHandler):
                             {
                                 "region": region,
                                 "main_peak": {
-                                    "height": fit_data.__closure__[0].cell_contents[0],
-                                    "center": fit_data.__closure__[0].cell_contents[1],
-                                    "sigma": fit_data.__closure__[0].cell_contents[2],
-                                    "gamma": fit_data.__closure__[0].cell_contents[3],
+                                    "height": fit_data.__closure__[
+                                        0
+                                    ].cell_contents[0],
+                                    "center": fit_data.__closure__[
+                                        0
+                                    ].cell_contents[1],
+                                    "sigma": fit_data.__closure__[
+                                        0
+                                    ].cell_contents[2],
+                                    "gamma": fit_data.__closure__[
+                                        0
+                                    ].cell_contents[3],
                                     "area": self.results[region]["area"],
                                 },
                             }
@@ -1468,8 +1570,12 @@ class PeakFitter(BaseIRHandler):
             current_measurement["number_acid_sites"] = {
                 "bronsted": {
                     "concentration": {
-                        "value": self.results["number_acid_sites"]["bronsted"]["value"],
-                        "error": self.results["number_acid_sites"]["bronsted"]["error"],
+                        "value": self.results["number_acid_sites"]["bronsted"][
+                            "value"
+                        ],
+                        "error": self.results["number_acid_sites"]["bronsted"][
+                            "error"
+                        ],
                         "unit": "μmol/g",
                     },
                     "surface_density": {
@@ -1501,8 +1607,12 @@ class PeakFitter(BaseIRHandler):
                 },
                 "lewis": {
                     "concentration": {
-                        "value": self.results["number_acid_sites"]["lewis"]["value"],
-                        "error": self.results["number_acid_sites"]["lewis"]["error"],
+                        "value": self.results["number_acid_sites"]["lewis"][
+                            "value"
+                        ],
+                        "error": self.results["number_acid_sites"]["lewis"][
+                            "error"
+                        ],
                         "unit": "μmol/g",
                     },
                     "surface_density": {
@@ -1633,7 +1743,9 @@ class PeakFitter(BaseIRHandler):
 
         print("\nAnalysis Results:")
         print("-" * 100)
-        print(f"{'Region':<15} {'Area':<15} {'Shoulder':<10} {'Parameters':<60}")
+        print(
+            f"{'Region':<15} {'Area':<15} {'Shoulder':<10} {'Parameters':<60}"
+        )
         print("-" * 100)
 
         for region, data in results.items():
@@ -1726,7 +1838,9 @@ class PeakFitter(BaseIRHandler):
         shoulder_info = []
         for region in self.config.constraints.keys():
             if region in self.forced_shoulders:
-                status = "enabled" if self.forced_shoulders[region] else "disabled"
+                status = (
+                    "enabled" if self.forced_shoulders[region] else "disabled"
+                )
                 shoulder_info.append(f"{region}: {status}")
 
         title = "Peak Analysis"
@@ -1814,7 +1928,9 @@ class PeakFitter(BaseIRHandler):
         if surface_area is not None:
             sample_metadata["surface_area"] = {
                 "value": surface_area,
-                "error": error_surface_area if error_surface_area is not None else 0,
+                "error": error_surface_area
+                if error_surface_area is not None
+                else 0,
                 "unit": "m²/g",
             }
 
@@ -1870,7 +1986,9 @@ class PeakFitter(BaseIRHandler):
         }
         self.metadata["measurements"].append(measurement)
 
-    def add_peak_metadata(self, region_name: str, peak_data: Dict[str, Any]) -> None:
+    def add_peak_metadata(
+        self, region_name: str, peak_data: Dict[str, Any]
+    ) -> None:
         """Add peak metadata for a specific region to the results dictionary.
 
         Args:
@@ -1917,7 +2035,9 @@ class PeakFitter(BaseIRHandler):
                 return {
                     "height": params[0],
                     "center": params[1],
-                    "width": 2 * np.sqrt(2 * np.log(2)) * sigma,  # Gaussian width
+                    "width": 2
+                    * np.sqrt(2 * np.log(2))
+                    * sigma,  # Gaussian width
                     "fwhm": fwhm,
                 }
             else:
@@ -1935,7 +2055,9 @@ class PeakFitter(BaseIRHandler):
             "fwhm": None,
         }
 
-    def add_fit_metadata(self, region_name: str, fit_data: Dict[str, Any]) -> None:
+    def add_fit_metadata(
+        self, region_name: str, fit_data: Dict[str, Any]
+    ) -> None:
         """Add fit metadata for a specific region to the results dictionary.
 
         Args:
@@ -2014,10 +2136,12 @@ class PeakFitter(BaseIRHandler):
                         error_sample_length=sample_data["length"]["error"],
                         error_sample_width=sample_data["width"]["error"],
                         error_sample_mass=sample_data["mass"]["error"],
-                        surface_area=sample_data.get("surface_area", {}).get("value"),
-                        error_surface_area=sample_data.get("surface_area", {}).get(
-                            "error"
+                        surface_area=sample_data.get("surface_area", {}).get(
+                            "value"
                         ),
+                        error_surface_area=sample_data.get(
+                            "surface_area", {}
+                        ).get("error"),
                         mass_unit=sample_data["mass"]["unit"],
                         length_unit=sample_data["length"]["unit"],
                         extinction_coefficient_unit=sample_data[
@@ -2036,11 +2160,19 @@ class PeakFitter(BaseIRHandler):
                         extinction_coefficient_lewis=sample_data[
                             "extinction_coefficient_lewis"
                         ],
-                        error_sample_length=sample_data.get("error_length", 0.001),
-                        error_sample_width=sample_data.get("error_width", 0.001),
-                        error_sample_mass=sample_data.get("error_mass", 0.0001),
+                        error_sample_length=sample_data.get(
+                            "error_length", 0.001
+                        ),
+                        error_sample_width=sample_data.get(
+                            "error_width", 0.001
+                        ),
+                        error_sample_mass=sample_data.get(
+                            "error_mass", 0.0001
+                        ),
                         surface_area=sample_data.get("surface_area"),
-                        error_surface_area=sample_data.get("error_surface_area"),
+                        error_surface_area=sample_data.get(
+                            "error_surface_area"
+                        ),
                         mass_unit=sample_data.get("mass_unit", "g"),
                         length_unit=sample_data.get("length_unit", "cm"),
                         extinction_coefficient_unit=sample_data.get(
