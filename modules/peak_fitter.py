@@ -124,6 +124,7 @@ class PeakFitter(BaseIRHandler):
             >>> fitter = PeakFitter("data", "sample1", config)
         """
         super().__init__(path_to_directory, folder)
+        self.path_to_directory = path_to_directory
         self.input_files = {
             file.stem: file for file in self.path.glob("*.csv") if file.is_file()
         }
@@ -1161,19 +1162,22 @@ class PeakFitter(BaseIRHandler):
             filename = str(filename)
 
         try:
-            match = re.search(r"\d+C.*?(\d+)C", filename)
+            match = re.search(r"\d+C.*?(\d+)C-Pyr-des", filename)
             if match:
                 return int(match.group(1))
             return None
         except (AttributeError, ValueError, TypeError):
             return None
 
-    def plot_results(self, name: str = None, index: int = None) -> None:
+    def plot_results(
+        self, name: str = None, index: int = None, save_path: Union[str, Path] = None
+    ) -> None:
         """Plot the analysis results.
 
         Args:
             name (str, optional): Name of the sample. Defaults to None.
             index (int, optional): Index of the measurement. Defaults to None.
+            save_path (Union[str, Path], optional): Custom path to save the plot. If None, uses the original directory.
         """
         if not hasattr(self, "results") or not self.results:
             print("No results available. Please run analyze() first.")
@@ -1332,7 +1336,21 @@ class PeakFitter(BaseIRHandler):
         if name is None:
             name = self.folder
 
-        plt.savefig(f"{name}_{temperature}C_fit.png", dpi=400)
+        # Use custom save path if provided, otherwise use the original directory
+        base_path = (
+            Path(save_path)
+            if save_path is not None
+            else Path(self.path_to_directory).parent
+        )
+
+        # Create fits_plots directory if it doesn't exist
+        fits_plots_dir = base_path / "fits_plots"
+        fits_plots_dir.mkdir(exist_ok=True)
+
+        # Save plot in fits_plots directory
+        plot_path = fits_plots_dir / f"{name}_{temperature}C_fit.png"
+        plt.savefig(plot_path, dpi=400)
+        print(f"Saved fit plot to {plot_path}")
         plt.show()
 
     def save_json(self, json_filename: str) -> None:
@@ -2058,6 +2076,343 @@ class PeakFitter(BaseIRHandler):
             print(f"Error decoding JSON file {json_filename}")
         except Exception as e:
             print(f"Error loading metadata: {str(e)}")
+
+    def recalculate_acid_sites(
+        self,
+        sample_length: Optional[float] = None,
+        sample_width: Optional[float] = None,
+        sample_mass: Optional[float] = None,
+        extinction_coefficient_bronsted: Optional[float] = None,
+        extinction_coefficient_lewis: Optional[float] = None,
+        error_sample_length: Optional[float] = None,
+        error_sample_width: Optional[float] = None,
+        error_sample_mass: Optional[float] = None,
+        surface_area: Optional[float] = None,
+        error_surface_area: Optional[float] = None,
+        json_filename: Optional[Union[str, Path]] = None,
+        index: Optional[int] = None,
+    ) -> None:
+        """Recalculate acid site concentrations and densities using updated sample metadata.
+
+        This method recalculates the acid site concentrations and densities using the existing
+        peak areas but with updated sample metadata. The results are stored in the class
+        instance and optionally updated in the JSON file.
+
+        If no index is provided, the recalculation is performed for all measurements.
+
+        Args:
+            sample_length (Optional[float]): Updated sample length in cm
+            sample_width (Optional[float]): Updated sample width in cm
+            sample_mass (Optional[float]): Updated sample mass in g
+            extinction_coefficient_bronsted (Optional[float]): Updated extinction coefficient for Bronsted sites in mmol cm^-2
+            extinction_coefficient_lewis (Optional[float]): Updated extinction coefficient for Lewis sites in mmol cm^-2
+            error_sample_length (Optional[float]): Updated error in sample length in cm
+            error_sample_width (Optional[float]): Updated error in sample width in cm
+            error_sample_mass (Optional[float]): Updated error in sample mass in g
+            surface_area (Optional[float]): Updated surface area of the sample in m²/g
+            error_surface_area (Optional[float]): Updated error in surface area in m²/g
+            json_filename (Optional[Union[str, Path]]): Path to JSON file to update
+            index (Optional[int]): Index of measurement to update in JSON file. If None, all measurements are updated.
+
+        Example:
+            >>> fitter.recalculate_acid_sites(
+            ...     sample_mass=0.15,  # Updated mass
+            ...     surface_area=500,  # Updated surface area
+            ...     json_filename="results.json"  # Update all measurements
+            ... )
+        """
+        try:
+            print("\nRecalculating acid sites with updated metadata...")
+
+            # Check if JSON file is provided
+            if json_filename is None:
+                raise ValueError(
+                    "JSON filename must be provided to recalculate acid sites"
+                )
+
+            # Load JSON data
+            with open(json_filename, "r") as f:
+                json_data = json.load(f)
+
+            # Get current metadata from JSON
+            current_metadata = json_data.get("sample_metadata", {})
+            print(f"Current metadata: {current_metadata}")
+
+            # Use provided values or fall back to current metadata
+            sample_length = sample_length or current_metadata.get("length", {}).get(
+                "value"
+            )
+            sample_width = sample_width or current_metadata.get("width", {}).get(
+                "value"
+            )
+            sample_mass = sample_mass or current_metadata.get("mass", {}).get("value")
+            extinction_coefficient_bronsted = (
+                extinction_coefficient_bronsted
+                or current_metadata.get("extinction_coefficient", {})
+                .get("bronsted", {})
+                .get("value")
+            )
+            extinction_coefficient_lewis = (
+                extinction_coefficient_lewis
+                or current_metadata.get("extinction_coefficient", {})
+                .get("lewis", {})
+                .get("value")
+            )
+
+            # Get error values from current metadata if not provided
+            error_sample_length = error_sample_length or current_metadata.get(
+                "length", {}
+            ).get("error")
+            error_sample_width = error_sample_width or current_metadata.get(
+                "width", {}
+            ).get("error")
+            error_sample_mass = error_sample_mass or current_metadata.get(
+                "mass", {}
+            ).get("error")
+
+            # Get surface area from current metadata if available and not provided
+            if surface_area is None and "surface_area" in current_metadata:
+                surface_area = current_metadata["surface_area"]["value"]
+                error_surface_area = (
+                    error_surface_area or current_metadata["surface_area"]["error"]
+                )
+
+            # Validate inputs
+            validate_sample_parameters(
+                sample_length,
+                sample_width,
+                sample_mass,
+                extinction_coefficient_bronsted,
+                extinction_coefficient_lewis,
+            )
+            validate_surface_area(surface_area, error_surface_area)
+
+            # Calculate sample area in cm²
+            sample_area = sample_length * sample_width
+            error_sample_area = sample_area * np.sqrt(
+                (error_sample_length / sample_length) ** 2
+                + (error_sample_width / sample_width) ** 2
+            )
+
+            # Create fits_plots directory if it doesn't exist
+            fits_plots_dir = Path(self.path_to_directory) / "fits_plots"
+            fits_plots_dir.mkdir(exist_ok=True)
+
+            # If no index is provided, get all available files
+            if index is None:
+                measurements = json_data.get("measurements", [])
+                # Filter measurements to only include corrected files
+                corrected_measurements = [
+                    i
+                    for i, m in enumerate(measurements)
+                    if m.get("data_file", "").endswith("_corr")
+                ]
+                indices = corrected_measurements
+                print(f"\nRecalculating for {len(indices)} corrected measurements...")
+            else:
+                # Verify that the specified index is for a corrected file
+                measurements = json_data.get("measurements", [])
+                if index >= len(measurements):
+                    raise ValueError(f"Index {index} out of range")
+                if not measurements[index].get("data_file", "").endswith("_corr"):
+                    raise ValueError(
+                        f"Measurement at index {index} is not a corrected file"
+                    )
+                indices = [index]
+
+            # Loop over all indices
+            for current_index in indices:
+                print(f"\nProcessing measurement {current_index}...")
+
+                # Get measurement data from JSON
+                measurements = json_data.get("measurements", [])
+                if current_index >= len(measurements):
+                    print(f"Warning: Index {current_index} out of range, skipping...")
+                    continue
+
+                measurement_data = measurements[current_index]
+                if not measurement_data:
+                    print(
+                        f"Warning: No data found for index {current_index}, skipping..."
+                    )
+                    continue
+
+                # Get peak areas from JSON
+                lewis_area = None
+                bronsted_area = None
+
+                # Search for peak areas in the fits array
+                fits = measurement_data.get("fits", [])
+                if not fits:
+                    print(
+                        f"Warning: No fits data found for measurement {current_index}, skipping..."
+                    )
+                    continue
+
+                for fit in fits:
+                    if fit.get("region") == "lewis":
+                        lewis_area = fit.get("main_peak", {}).get("area")
+                    elif fit.get("region") == "bronsted":
+                        bronsted_area = fit.get("main_peak", {}).get("area")
+
+                if lewis_area is None or bronsted_area is None:
+                    print(
+                        f"Warning: Could not find peak areas for measurement {current_index}, skipping..."
+                    )
+                    continue
+
+                # Save fit plots
+                data_file = measurement_data.get("data_file", "")
+                if data_file:
+                    # Remove .txt extension if present
+                    base_name = Path(data_file).stem
+                    # Create plot filename
+                    plot_filename = fits_plots_dir / f"{base_name}_fit.png"
+                    # Plot and save
+                    self.plot_results(name=str(plot_filename), index=current_index)
+                    print(f"Saved fit plot to {plot_filename}")
+
+                print(f"\nUsing updated values for measurement {current_index}:")
+                print(f"Sample area: {sample_area:.4f} ± {error_sample_area:.4f} cm²")
+                print(f"Sample mass: {sample_mass:.4f} ± {error_sample_mass:.4f} g")
+                print(f"Lewis area: {lewis_area:.4f}")
+                print(f"Bronsted area: {bronsted_area:.4f}")
+                print(
+                    f"Extinction coefficient (Lewis): {extinction_coefficient_lewis:.4f}"
+                )
+                print(
+                    f"Extinction coefficient (Bronsted): {extinction_coefficient_bronsted:.4f}"
+                )
+
+                # Calculate number of acid sites in μmol/g
+                n_bronsted = (
+                    bronsted_area
+                    * sample_area
+                    / (sample_mass * extinction_coefficient_bronsted)
+                )
+                n_lewis = (
+                    lewis_area
+                    * sample_area
+                    / (sample_mass * extinction_coefficient_lewis)
+                )
+
+                # Calculate errors
+                error_bronsted = n_bronsted * np.sqrt(
+                    (error_sample_area / sample_area) ** 2
+                    + (error_sample_mass / sample_mass) ** 2
+                )
+                error_lewis = n_lewis * np.sqrt(
+                    (error_sample_area / sample_area) ** 2
+                    + (error_sample_mass / sample_mass) ** 2
+                )
+
+                # Update results in JSON data
+                if "number_acid_sites" not in measurement_data:
+                    measurement_data["number_acid_sites"] = {}
+
+                measurement_data["number_acid_sites"] = {
+                    "bronsted": {"value": n_bronsted, "error": error_bronsted},
+                    "lewis": {"value": n_lewis, "error": error_lewis},
+                }
+                print(f"\nRecalculated acid sites for measurement {current_index}:")
+                print(f"Bronsted: {n_bronsted:.4f} ± {error_bronsted:.4f} μmol/g")
+                print(f"Lewis: {n_lewis:.4f} ± {error_lewis:.4f} μmol/g")
+
+                # If surface area is provided, calculate site density
+                if surface_area is not None:
+                    # Convert surface area from m²/g to nm²/g
+                    surface_area_nm2 = surface_area * 1e18
+                    error_surface_area_nm2 = (
+                        error_surface_area * 1e18 if error_surface_area else 0
+                    )
+
+                    # Calculate site density in sites/nm²
+                    bronsted_density = (n_bronsted * 6.022e20) / surface_area_nm2
+                    lewis_density = (n_lewis * 6.022e20) / surface_area_nm2
+
+                    # Calculate errors for site density
+                    error_bronsted_density = bronsted_density * np.sqrt(
+                        (error_bronsted / n_bronsted) ** 2
+                        + (error_surface_area_nm2 / surface_area_nm2) ** 2
+                    )
+                    error_lewis_density = lewis_density * np.sqrt(
+                        (error_lewis / n_lewis) ** 2
+                        + (error_surface_area_nm2 / surface_area_nm2) ** 2
+                    )
+
+                    # Calculate acid sites in μmol/nm²
+                    bronsted_umol_nm2 = n_bronsted / surface_area_nm2
+                    lewis_umol_nm2 = n_lewis / surface_area_nm2
+
+                    # Calculate errors for surface concentration
+                    error_bronsted_umol_nm2 = bronsted_umol_nm2 * np.sqrt(
+                        (error_bronsted / n_bronsted) ** 2
+                        + (error_surface_area_nm2 / surface_area_nm2) ** 2
+                    )
+                    error_lewis_umol_nm2 = lewis_umol_nm2 * np.sqrt(
+                        (error_lewis / n_lewis) ** 2
+                        + (error_surface_area_nm2 / surface_area_nm2) ** 2
+                    )
+
+                    # Update results with surface density and concentration
+                    measurement_data["number_acid_sites"]["bronsted"].update(
+                        {
+                            "surface_density": {
+                                "value": bronsted_density,
+                                "error": error_bronsted_density,
+                                "unit": "sites/nm²",
+                            },
+                            "surface_concentration": {
+                                "value": bronsted_umol_nm2,
+                                "error": error_bronsted_umol_nm2,
+                                "unit": "μmol/nm²",
+                            },
+                        }
+                    )
+                    measurement_data["number_acid_sites"]["lewis"].update(
+                        {
+                            "surface_density": {
+                                "value": lewis_density,
+                                "error": error_lewis_density,
+                                "unit": "sites/nm²",
+                            },
+                            "surface_concentration": {
+                                "value": lewis_umol_nm2,
+                                "error": error_lewis_umol_nm2,
+                                "unit": "μmol/nm²",
+                            },
+                        }
+                    )
+
+                    print(
+                        f"\nRecalculated surface densities for measurement {current_index}:"
+                    )
+                    print(
+                        f"Bronsted: {bronsted_density:.4f} ± {error_bronsted_density:.4f} sites/nm²"
+                    )
+                    print(
+                        f"Lewis: {lewis_density:.4f} ± {error_lewis_density:.4f} sites/nm²"
+                    )
+                    print(
+                        f"\nRecalculated surface concentrations for measurement {current_index}:"
+                    )
+                    print(
+                        f"Bronsted: {bronsted_umol_nm2:.4f} ± {error_bronsted_umol_nm2:.4f} μmol/nm²"
+                    )
+                    print(
+                        f"Lewis: {lewis_umol_nm2:.4f} ± {error_lewis_umol_nm2:.4f} μmol/nm²"
+                    )
+
+                # Update JSON file
+                with open(json_filename, "w") as f:
+                    json.dump(json_data, f, indent=4)
+                print(
+                    f"\nUpdated results saved to {json_filename} for measurement {current_index}"
+                )
+
+        except Exception as e:
+            print(f"Error in recalculate_acid_sites: {str(e)}")
+            raise
 
 
 if __name__ == "__main__":
