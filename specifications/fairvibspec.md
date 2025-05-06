@@ -14,12 +14,12 @@ Root object of the FAIRVibSpec data model. Meant to hold a single IR or Raman ex
 - datetime_modified
   - Type: string
   - Description: Date and time this dataset has last been modified.
-- contributors
-  - Type: string[]
-  - Description: List of contributors.
-- experiment
-  - Type: Experiment
-  - Description: List of experiments associated with this dataset.
+- qualitative_measurement
+  - Type: QualitativeMeasurement
+  - Description: Qualitative measurement experiment associated with this dataset.
+- measurement_series
+  - Type: MeasurementSeries
+  - Description: Measurement series experiment associated with this dataset.
 
 ### Experiment
 
@@ -28,59 +28,43 @@ Container for a single experiment, possibly containing multiple spectra or multi
 - __name__
   - Type: string
   - Description: A descriptive name for the overarching experiment.
-- varied_parameter
+- __vib_spec_type__
+  - Type: VibSpecType
+  - Description: Type of vibrational spectroscopy.
+- purpose
   - Type: string
-  - Description: Parameter that was varied between measurements.
-- static_parameters
-  - Type: Parameters
-  - Description: Object containing static parameters of the experiment.
+  - Description: Purpose of the experiment.
+- instrument
+  - Type: Instrument
+  - Description: Instrument and its parameters used for the experiment.
 - measurements
   - Type: Measurement[]
   - Description: Container for all measurements done for the experiment.
-- analysis
-  - Type: Analysis[]
-  - Description: Container for all analysis steps and parameters.
-- results
-  - Type: Result
-  - Description: Container for the results of the experiment.
+- experiment_results
+  - Type: Result[]
+  - Description: Container for the results of the experiment. These results are different from the results of the analysis of each measurement.
 
-### Parameters
+### MeasurementSeries [*Experiment*]
 
-This object keeps track of important synthesis and measurement parameters.
+A type of experiment in which a parameter like concentration, temperature, etc. was varied over time.
 
-- mass
-  - Type: Value
-  - Description: Mass of the sample
-- sample_area
-  - Type: Value
-  - Description: Area of the sample
-- literature_reference
+- varied_parameter
+  - Type: string
+  - Description: Parameter that was varied between measurements.
+- parameter_unit
+  - Type: UnitDefinition
+  - Description: Unit of the varied parameter. Was string.
+- parameter_series
+  - Type: float[]
+  - Description: Values of the varied parameter. Must be of length measurements.
+
+### QualitativeMeasurement [*Experiment*]
+
+A type of experiment in which the presence, absence, or intensity of one or more bands is observed.
+
+- observed_bands
   - Type: string[]
-  - Description: Points to literature references used for the sample preparation
-- composition
-  - Type: string
-  - Description: Relative amount of components used in preparation
-- probe_molecule
-  - Type: string
-  - Description: Probe molecule used
-- sample_preparation
-  - Type: string
-  - Description: Addidional description of preparation parameters.
-- measurement_temperature
-  - Type: Value
-  - Description: Temperature during the measurement.
-- measurement_pressure
-  - Type: Value
-  - Description: Pressure during the measurement.
-- measurement_geometry
-  - Type: string
-  - Description: Spectrometer geometry used for the measurement.
-- desorption_time
-  - Type: Value
-  - Description: Time given to the sample to desorb probe molecule.
-- desorption_temperature
-  - Type: Value
-  - Description: Temperature at which probe molecule desorption is performed.
+  - Description: IDs of the bands that were observed.
 
 ### Measurement
 
@@ -92,27 +76,114 @@ Contains one measurement done for the experiment. E.g. sample, unloaded sample a
 - name
   - Type: string
   - Description: Descriptive name for the single measurement.
-- __vib_spec_type__
-  - Type: VibSpecType
-  - Description: Type of vibrational spectroscopy.
-- varied_parameter_value
-  - Type: Value
-  - Description: Value of the varied parameter for the given measurement.
 - measurement_type
-  - Type: MeasurementTypes
+  - Type: MeasurementType
   - Description: Type of measurement.
-- __detection__
+- sample
+  - Type: Sample
+  - Description: Sample object containing information about the sample.
+- temperature
+  - Type: float
+  - Description: Temperature of the measurement.
+- temperature_unit
+  - Type: UnitDefinition
+  - Description: Unit of the temperature.
+- x_data
+  - Type: float[]
+  - Description: The x-axis data points, i.e. wavenumbers or wavelengths.
+- x_data_unit
+  - Type: UnitDefinition
+  - Description: Unit of the x-axis data points.
+- y_data
+  - Type: float[]
+  - Description: The y-axis data points, i.e. intensities, counts, etc.
+- y_data_unit
+  - Type: UnitDefinition
+  - Description: Unit of the y-axis data points.
+- analysis
+  - Type: Analysis
+  - Description: Analysis object containing information about the analysis performed on the measurement.
+
+### Sample
+
+Contains information about the sample used for the measurement.
+
+- __name__
+  - Type: string
+  - Description: Name of the sample.
+- composition
+  - Type: string
+  - Description: Relative amount of components used in preparation
+- preparation
+  - Type: string
+  - Description: Preparation of the sample.
+- extinction_coefficients
+  - Type: float[]
+  - Description: Extinction coefficients of the sample.
+- vessel
+  - Type: string
+  - Description: Type of vessel used for the sample.
+- mass
+  - Type: float
+  - Description: Mass of the sample.
+- mass_unit
+  - Type: UnitDefinition
+  - Description: Unit of the mass.
+- volume
+  - Type: float
+  - Description: Volume of the sample.
+- volume_unit
+  - Type: UnitDefinition
+  - Description: Unit of the volume.
+- sample_area
+  - Type: float
+  - Description: Area of the sample.
+- sample_area_unit
+  - Type: UnitDefinition
+  - Description: Unit of the sample area.
+- literature_reference
+  - Type: string[]
+  - Description: Points to literature references used for the sample preparation.
+
+### Instrument
+
+Contains information about the instrument used for the measurement.
+
+- __name__
+  - Type: string
+  - Description: Name of the instrument.
+- __instrument_type__
+  - Type: string
+  - Description: Type of instrument.
+- __detection_type__
   - Type: Detection
   - Description: Method/Geometry of detection.
-- measurement_data
-  - Type: Dataset
-  - Description: Series objects of the measured axes.
-- static_parameters
-  - Type: Parameters
-  - Description: Parameter object with attributes that do not change during the experiment or measurement series.
 - instrument_parameters
-  - Type: SIFParameters
+  - Type: IRParameters, SIFParameters, SPCParameters
   - Description: Parameters of the instrument used for the measurement. Type depends on which vibrational spectroscopy is used and the instrument itself.
+- probe_molecule
+  - Type: string
+  - Description: Probe molecule used.
+- desorption_time
+  - Type: float
+  - Description: If probe molecule is used, time given to the sample to desorb probe molecule.
+- desorption_time_unit
+  - Type: UnitDefinition
+  - Description: Unit of the desorption time.
+- desorption_temperature
+  - Type: float
+  - Description: If probe molecule is used, temperature at which probe molecule desorption is performed.
+- desorption_temperature_unit
+  - Type: UnitDefinition
+  - Description: Unit of the desorption temperature.
+
+### IRParameters
+
+Parameters of the IR spectrometer used for the measurement.
+
+- laser_wavelength
+  - Type: float
+  - Description: Wavelength of the laser in nm.
 
 ### SIFParameters
 
@@ -224,22 +295,33 @@ Parameters extracted from the SIF file of the Raman spectrometer used for the me
   - Type: integer
   - Description: Data offset.
 
+### SPCParameters
+
+Parameters extracted from the SPC file of the Raman spectrometer used for the measurement.
+
+- spc_version
+  - Type: integer
+  - Description: SPC file version number.
+
 ### Analysis
 
 Contains all steps and parameters used to manipulate data and to calculate results from one sample measurement.
 
-- background_reference
-  - Type: string
-  - Description: Reference to the IDs of background measurements used.
-- __sample_reference__
-  - Type: string
-  - Description: Reference to the ID of the sample measurement.
-- corrected_data
-  - Type: Dataset
-  - Description: Dataset based on a measured sample and corrected with the background measurement and optionally baseline corrected.
-- baseline
-  - Type: Series
-  - Description: Dataset containing the baseline values. Calculation is based on the classification algorithm FastChrom (Johnsen, L., et al., Analyst. 2013, 138, 3502-3511.).
+- x_data_corrected
+  - Type: float[]
+  - Description: The corrected x-axis data points, i.e. wavenumbers or wavelengths.
+- x_data_unit
+  - Type: UnitDefinition
+  - Description: Unit of the corrected x-axis data points.
+- y_data_corrected
+  - Type: float[]
+  - Description: The corrected y-axis data points, i.e. intensities, counts, etc.
+- y_data_unit
+  - Type: UnitDefinition
+  - Description: Unit of the corrected y-axis data points.
+- processing_steps
+  - Type: ProcessingSteps
+  - Description: Contains the processing steps performed, as well as the parameters used for them.
 - bands
   - Type: Band[]
   - Description: Bands assigned and quantified within the spectrum.
@@ -247,28 +329,54 @@ Contains all steps and parameters used to manipulate data and to calculate resul
   - Type: Result[]
   - Description: List of final results calculated from one measurement.
 
+### ProcessingSteps
+
+Contains the processing steps performed, as well as the parameters used for them.
+
+- is_background_corrected
+  - Type: boolean
+  - Description: Whether background correction was performed.
+- background_reference
+  - Type: string
+  - Description: Reference to the ID of the background measurement used.
+- is_baseline_corrected
+  - Type: boolean
+  - Description: Whether baseline correction was performed.
+- baseline
+  - Type: float[]
+  - Description: List of baseline values. Calculation is based on the classification algorithm FastChrom (Johnsen, L., et al., Analyst. 2013, 138, 3502-3511.).
+- is_fitted
+  - Type: boolean
+  - Description: Whether the spectrum has been fitted.
+
 ### Band
 
 Contains parameters of a band analyzed during the analysis.
 
+- __band_index__
+  - Type: integer
+  - Description: Index of assigned bands in the spectrum from left to right.
 - assignment
   - Type: string
-  - Description: Assignment of the band
+  - Description: Assignment of the band, should be a Sample.name.
+- position
+  - Type: float
+  - Description: Position of the band maximum.
+- start
+  - Type: float
+  - Description: First data point attributed to the band.
+- end
+  - Type: float
+  - Description: Last data point attributed to the band.
+- intensity
+  - Type: float
+  - Description: Intensity of the band.
+- fwhm
+  - Type: float
+  - Description: Full width at half maximum of the band.
 - fit
   - Type: Fit
   - Description: Calculated fit for the band.
-- location
-  - Type: Value
-  - Description: Location of the band maximum.
-- start
-  - Type: Value
-  - Description: First data point attributed to the band.
-- end
-  - Type: Value
-  - Description: Last data point attributed to the band.
-- extinction_coefficient
-  - Type: Value
-  - Description: Molar extinction coefficient of the band.
 
 ### Fit
 
@@ -280,73 +388,73 @@ Contains the fitting function and the found optimal parameters.
 - formula
   - Type: string
   - Description: Implemented formula of the fitting model. Corresponds with the sequence of fitting parameters.
-- parameters
-  - Type: Value[]
-  - Description: Optained optimal fitting parameters. Sequence according to formula.
-- area
-  - Type: Value
+- amplitude
+  - Type: float
+  - Description: Amplitude of the fitted model curve.
+- center
+  - Type: float
+  - Description: Center of the fitted model curve.
+- gaussian_width
+  - Type: float
+  - Description: Width of the Gaussian component of the fitted model curve.
+- lorentzian_width
+  - Type: float
+  - Description: Width of the Lorentzian component of the fitted model curve.
+- fraction_lorentzian
+  - Type: float
+  - Description: Fraction of the Lorentzian component of the fitted model curve.
+  - Min: 0
+  - Max: 1
+- fit_position
+  - Type: float
+  - Description: Position of the fitted model curve.
+- fit_position_error
+  - Type: float
+  - Description: Error of the position of the fitted model curve.
+- fit_intensity
+  - Type: float
+  - Description: Intensity of the fitted model curve.
+- fit_intensity_error
+  - Type: float
+  - Description: Error of the intensity of the fitted model curve.
+- fit_fwhm
+  - Type: float
+  - Description: FWHM of the fitted model curve.
+- fit_fwhm_error
+  - Type: float
+  - Description: Error of the FWHM of the fitted model curve.
+- fit_area
+  - Type: float
   - Description: Total area of the fitted model curve.
+- fit_area_error
+  - Type: float
+  - Description: Error of the total area of the fitted model curve.
 
 ### Result
 
-A final result obtained from the analysis.
+Generic container for a calculated value resulting from the analysis of a single measurement or the entire experiment.
 
 - __name__
   - Type: string
-  - Description: Name of the calculated value
-- value
-  - Type: Value
-  - Description: Value(s) for the specified result.
-
-### Dataset
-
-Container for a single set of data.
-
-- timestamp
+  - Description: Name of the calculated value.
+- description
   - Type: string
-  - Description: Date and time the data was recorded
-- x_axis
-  - Type: Series
-  - Description: The object containing data points and unit of the x-axis.
-- y_axis
-  - Type: Series
-  - Description: The object containing data points and unit of the y-axis.
-
-## Utility objects
-
-### Series
-
-Abstract Container for a measured Series (i.e. one axis).
-
-- data_array
-  - Type: float[]
-  - Description: List of data points of one measured Series.
+  - Description: A description of the kind of value this result contains.
+- value
+  - Type: float
+  - Description: Value(s) for the specified result.
 - unit
   - Type: UnitDefinition
-  - Description: Unit of the data points contained in `data_array`.
-
-### Value
-
-Abstract Container for a single value-unit pair.
-
-- __value__
-  - Type: float
-  - Description: Value of the data point
-- __unit__
-  - Type: UnitDefinition
-  - Description: Unit of the data point contained in `value`.
+  - Description: Unit of the value.
 - error
   - Type: float
-  - Description: Error of the value.
-- error2
-  - Type: float
-  - Description: If the error is not symetric in both directions, this value specifies the error into the other direction.
+  - Description: Optional error of the value.
 
 ## Enumerations
 
-### MeasurementTypes
+### MeasurementType
 
-Possible types of measurements to be used during analysis
+Possible types of measurements to be used during analysis.
 
 ```python
 BACKGROUND = "background"
@@ -355,12 +463,14 @@ SAMPLE = "sample"
 
 ### Detection
 
-Detection method used in the experiment. "Transmission" expects minima in the spectrum for the bands. "Intensity" or "Absorbance" treats bands as maxima in the spectrum.
+Detection method used in the experiment. "Transmission" expects minima in the spectrum for the bands. "Intensity", "Absorbance" or "Fluorescence" treats bands as maxima in the spectrum.
 
 ```python
-TRANSMITTANCE = "transmittance"
 ABSORBANCE = "absorbance"
+EXCTINCTION = "extinction"
+FLUORESCENCE = "fluorescence"
 INTENSITY = "intensity"
+TRANSMITTANCE = "transmittance"
 ```
 
 ### VibSpecType
@@ -370,4 +480,5 @@ Type of vibrational spectroscopy.
 ```python
 IR = "ir"
 RAMAN = "raman"
+ROTATIONAL = "rotational"
 ```
