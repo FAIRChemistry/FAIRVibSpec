@@ -44,7 +44,7 @@ Container for a single experiment, possibly containing multiple spectra or multi
   - Type: Result[]
   - Description: Container for the results of the experiment. These results are different from the results of the analysis of each measurement.
 
-### MeasurementSeries [*Experiment*]
+### MeasurementSeries [Experiment]
 
 A type of experiment in which a parameter like concentration, temperature, etc. was varied over time.
 
@@ -58,7 +58,7 @@ A type of experiment in which a parameter like concentration, temperature, etc. 
   - Type: float[]
   - Description: Values of the varied parameter. Must be of length measurements.
 
-### QualitativeMeasurement [*Experiment*]
+### QualitativeMeasurement [Experiment]
 
 A type of experiment in which the presence, absence, or intensity of one or more bands is observed.
 
