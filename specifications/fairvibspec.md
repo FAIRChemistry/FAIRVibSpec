@@ -37,9 +37,9 @@ Container for a single experiment, possibly containing multiple spectra or multi
 - instrument
   - Type: Instrument
   - Description: Instrument and its parameters used for the experiment.
-- measurements
-  - Type: Measurement[]
-  - Description: Container for all measurements done for the experiment.
+- spectra
+  - Type: Spectrum[]
+  - Description: Container for all spectra measured or simulated for the experiment.
 - experiment_results
   - Type: Result[]
   - Description: Container for the results of the experiment. These results are different from the results of the analysis of each measurement.
@@ -66,9 +66,9 @@ A type of experiment in which the presence, absence, or intensity of one or more
   - Type: string[]
   - Description: IDs of the bands that were observed.
 
-### Measurement
+### Spectrum
 
-Contains one measurement done for the experiment. E.g. sample, unloaded sample and background.
+Contains one spectrum recorded or simulated for the experiment.
 
 - __id__
   - Type: Identifier
@@ -76,12 +76,6 @@ Contains one measurement done for the experiment. E.g. sample, unloaded sample a
 - name
   - Type: string
   - Description: Descriptive name for the single measurement.
-- measurement_type
-  - Type: MeasurementType
-  - Description: Type of measurement.
-- sample
-  - Type: Sample
-  - Description: Sample object containing information about the sample.
 - temperature
   - Type: float
   - Description: Temperature of the measurement.
@@ -103,6 +97,25 @@ Contains one measurement done for the experiment. E.g. sample, unloaded sample a
 - analysis
   - Type: Analysis
   - Description: Analysis object containing information about the analysis performed on the measurement.
+
+### MeasuredSpectrum [Spectrum]
+
+A type of spectrum in which a measurement was performed.
+
+- measurement_type
+  - Type: MeasurementType
+  - Description: Type of measurement.
+- sample
+  - Type: Sample
+  - Description: Sample object containing information about the sample.
+
+### SimulatedSpectrum [Spectrum]
+
+A type of spectrum in which a simulation was performed.
+
+- simulation_method
+  - Type: DFT, MD
+  - Description: Theory used for the simulation.
 
 ### Sample
 
@@ -144,6 +157,22 @@ Contains information about the sample used for the measurement.
 - literature_reference
   - Type: string[]
   - Description: Points to literature references used for the sample preparation.
+
+### DFT
+
+Parameters of the DFT simulation.
+
+- functional
+  - Type: string
+  - Description: Functional used for the simulation.
+
+### MD
+
+Parameters of the MD simulation.
+
+- forcefield
+  - Type: string
+  - Description: Forcefield used for the simulation.
 
 ### Instrument
 

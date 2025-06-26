@@ -174,7 +174,7 @@ class Experiment(BaseModel):
     vib_spec_type: VibSpecType
     purpose: Optional[str] = Field(default=None)
     instrument: Optional[Instrument] = Field(default=None)
-    measurements: list[Measurement] = Field(default_factory=list)
+    spectra: list[Spectrum] = Field(default_factory=list)
     experiment_results: list[Result] = Field(default_factory=list)
 
     # JSON-LD fields
@@ -195,17 +195,17 @@ class Experiment(BaseModel):
         }
     )
 
-    def filter_measurements(self, **kwargs) -> list[Measurement]:
-        """Filters the measurements attribute based on the given kwargs
+    def filter_spectra(self, **kwargs) -> list[Spectrum]:
+        """Filters the spectra attribute based on the given kwargs
 
         Args:
             **kwargs: The attributes to filter by.
 
         Returns:
-            list[Measurement]: The filtered list of Measurement objects
+            list[Spectrum]: The filtered list of Spectrum objects
         """
 
-        return FilterWrapper[Measurement](self.measurements, **kwargs).filter()
+        return FilterWrapper[Spectrum](self.spectra, **kwargs).filter()
 
     def filter_experiment_results(self, **kwargs) -> list[Result]:
         """Filters the experiment_results attribute based on the given kwargs
@@ -287,12 +287,10 @@ class Experiment(BaseModel):
         self.ld_type.append(term)
 
 
-    def add_to_measurements(
+    def add_to_spectra(
         self,
         id: str,
         name: Optional[str]= None,
-        measurement_type: Optional[MeasurementType]= None,
-        sample: Optional[Sample]= None,
         temperature: Optional[float]= None,
         temperature_unit: Optional[UnitDefinition]= None,
         x_data: list[float]= [],
@@ -305,8 +303,6 @@ class Experiment(BaseModel):
         params = {
             "id": id,
             "name": name,
-            "measurement_type": measurement_type,
-            "sample": sample,
             "temperature": temperature,
             "temperature_unit": temperature_unit,
             "x_data": x_data,
@@ -319,11 +315,11 @@ class Experiment(BaseModel):
         if "id" in kwargs:
             params["id"] = kwargs["id"]
 
-        self.measurements.append(
-            Measurement(**params)
+        self.spectra.append(
+            Spectrum(**params)
         )
 
-        return self.measurements[-1]
+        return self.spectra[-1]
 
 
     def add_to_experiment_results(
@@ -365,7 +361,7 @@ class MeasurementSeries(BaseModel):
     parameter_series: list[float] = Field(default_factory=list)
     purpose: Optional[str] = Field(default=None)
     instrument: Optional[Instrument] = Field(default=None)
-    measurements: list[Measurement] = Field(default_factory=list)
+    spectra: list[Spectrum] = Field(default_factory=list)
     experiment_results: list[Result] = Field(default_factory=list)
 
     # JSON-LD fields
@@ -386,17 +382,17 @@ class MeasurementSeries(BaseModel):
         }
     )
 
-    def filter_measurements(self, **kwargs) -> list[Measurement]:
-        """Filters the measurements attribute based on the given kwargs
+    def filter_spectra(self, **kwargs) -> list[Spectrum]:
+        """Filters the spectra attribute based on the given kwargs
 
         Args:
             **kwargs: The attributes to filter by.
 
         Returns:
-            list[Measurement]: The filtered list of Measurement objects
+            list[Spectrum]: The filtered list of Spectrum objects
         """
 
-        return FilterWrapper[Measurement](self.measurements, **kwargs).filter()
+        return FilterWrapper[Spectrum](self.spectra, **kwargs).filter()
 
     def filter_experiment_results(self, **kwargs) -> list[Result]:
         """Filters the experiment_results attribute based on the given kwargs
@@ -478,12 +474,10 @@ class MeasurementSeries(BaseModel):
         self.ld_type.append(term)
 
 
-    def add_to_measurements(
+    def add_to_spectra(
         self,
         id: str,
         name: Optional[str]= None,
-        measurement_type: Optional[MeasurementType]= None,
-        sample: Optional[Sample]= None,
         temperature: Optional[float]= None,
         temperature_unit: Optional[UnitDefinition]= None,
         x_data: list[float]= [],
@@ -496,8 +490,6 @@ class MeasurementSeries(BaseModel):
         params = {
             "id": id,
             "name": name,
-            "measurement_type": measurement_type,
-            "sample": sample,
             "temperature": temperature,
             "temperature_unit": temperature_unit,
             "x_data": x_data,
@@ -510,11 +502,11 @@ class MeasurementSeries(BaseModel):
         if "id" in kwargs:
             params["id"] = kwargs["id"]
 
-        self.measurements.append(
-            Measurement(**params)
+        self.spectra.append(
+            Spectrum(**params)
         )
 
-        return self.measurements[-1]
+        return self.spectra[-1]
 
 
     def add_to_experiment_results(
@@ -554,7 +546,7 @@ class QualitativeMeasurement(BaseModel):
     observed_bands: list[str] = Field(default_factory=list)
     purpose: Optional[str] = Field(default=None)
     instrument: Optional[Instrument] = Field(default=None)
-    measurements: list[Measurement] = Field(default_factory=list)
+    spectra: list[Spectrum] = Field(default_factory=list)
     experiment_results: list[Result] = Field(default_factory=list)
 
     # JSON-LD fields
@@ -575,17 +567,17 @@ class QualitativeMeasurement(BaseModel):
         }
     )
 
-    def filter_measurements(self, **kwargs) -> list[Measurement]:
-        """Filters the measurements attribute based on the given kwargs
+    def filter_spectra(self, **kwargs) -> list[Spectrum]:
+        """Filters the spectra attribute based on the given kwargs
 
         Args:
             **kwargs: The attributes to filter by.
 
         Returns:
-            list[Measurement]: The filtered list of Measurement objects
+            list[Spectrum]: The filtered list of Spectrum objects
         """
 
-        return FilterWrapper[Measurement](self.measurements, **kwargs).filter()
+        return FilterWrapper[Spectrum](self.spectra, **kwargs).filter()
 
     def filter_experiment_results(self, **kwargs) -> list[Result]:
         """Filters the experiment_results attribute based on the given kwargs
@@ -667,12 +659,10 @@ class QualitativeMeasurement(BaseModel):
         self.ld_type.append(term)
 
 
-    def add_to_measurements(
+    def add_to_spectra(
         self,
         id: str,
         name: Optional[str]= None,
-        measurement_type: Optional[MeasurementType]= None,
-        sample: Optional[Sample]= None,
         temperature: Optional[float]= None,
         temperature_unit: Optional[UnitDefinition]= None,
         x_data: list[float]= [],
@@ -685,8 +675,6 @@ class QualitativeMeasurement(BaseModel):
         params = {
             "id": id,
             "name": name,
-            "measurement_type": measurement_type,
-            "sample": sample,
             "temperature": temperature,
             "temperature_unit": temperature_unit,
             "x_data": x_data,
@@ -699,11 +687,11 @@ class QualitativeMeasurement(BaseModel):
         if "id" in kwargs:
             params["id"] = kwargs["id"]
 
-        self.measurements.append(
-            Measurement(**params)
+        self.spectra.append(
+            Spectrum(**params)
         )
 
-        return self.measurements[-1]
+        return self.spectra[-1]
 
 
     def add_to_experiment_results(
@@ -732,7 +720,7 @@ class QualitativeMeasurement(BaseModel):
 
         return self.experiment_results[-1]
 
-class Measurement(BaseModel):
+class Spectrum(BaseModel):
 
     model_config: ConfigDict = ConfigDict( # type: ignore
         validate_assigment = True,
@@ -740,8 +728,6 @@ class Measurement(BaseModel):
 
     id: str
     name: Optional[str] = Field(default=None)
-    measurement_type: Optional[MeasurementType] = Field(default=None)
-    sample: Optional[Sample] = Field(default=None)
     temperature: Optional[float] = Field(default=None)
     temperature_unit: Optional[UnitDefinition] = Field(default=None)
     x_data: list[float] = Field(default_factory=list)
@@ -753,12 +739,225 @@ class Measurement(BaseModel):
     # JSON-LD fields
     ld_id: str = Field(
         serialization_alias="@id",
-        default_factory=lambda: "md:Measurement/" + str(uuid4())
+        default_factory=lambda: "md:Spectrum/" + str(uuid4())
     )
     ld_type: list[str] = Field(
         serialization_alias="@type",
         default_factory = lambda: [
-            "md:Measurement",
+            "md:Spectrum",
+        ],
+    )
+    ld_context: dict[str, str | dict] = Field(
+        serialization_alias="@context",
+        default_factory = lambda: {
+            "md": "http://mdmodel.net/",
+            "id": {
+                "@type": "@id",
+            },
+        }
+    )
+
+
+    def set_attr_term(
+        self,
+        attr: str,
+        term: str | dict,
+        prefix: str | None = None,
+        iri: str | None = None
+    ):
+        """Sets the term for a given attribute in the JSON-LD object
+
+        Example:
+            # Using an IRI term
+            >> obj.set_attr_term("name", "http://schema.org/givenName")
+
+            # Using a prefix and term
+            >> obj.set_attr_term("name", "schema:givenName", "schema", "http://schema.org")
+
+            # Usinng a dictionary term
+            >> obj.set_attr_term("name", {"@id": "http://schema.org/givenName", "@type": "@id"})
+
+        Args:
+            attr (str): The attribute to set the term for
+            term (str | dict): The term to set for the attribute
+
+        Raises:
+            AssertionError: If the attribute is not found in the model
+        """
+
+        assert attr in self.model_fields, f"Attribute {attr} not found in {self.__class__.__name__}"
+
+        if prefix:
+            validate_prefix(term, prefix)
+
+        add_namespace(self, prefix, iri)
+        self.ld_context[attr] = term
+
+    def add_type_term(
+        self,
+        term: str,
+        prefix: str | None = None,
+        iri: str | None = None
+    ):
+        """Adds a term to the @type field of the JSON-LD object
+
+        Example:
+            # Using a term
+            >> obj.add_type_term("https://schema.org/Person")
+
+            # Using a prefixed term
+            >> obj.add_type_term("schema:Person", "schema", "https://schema.org/Person")
+
+        Args:
+            term (str): The term to add to the @type field
+            prefix (str, optional): The prefix to use for the term. Defaults to None.
+            iri (str, optional): The IRI to use for the term prefix. Defaults to None.
+
+        Raises:
+            ValueError: If prefix is provided but iri is not
+            ValueError: If iri is provided but prefix is not
+        """
+
+        if prefix:
+            validate_prefix(term, prefix)
+
+        add_namespace(self, prefix, iri)
+        self.ld_type.append(term)
+
+
+class MeasuredSpectrum(BaseModel):
+
+    model_config: ConfigDict = ConfigDict( # type: ignore
+        validate_assigment = True,
+    ) # type: ignore
+
+    id: str
+    measurement_type: Optional[MeasurementType] = Field(default=None)
+    sample: Optional[Sample] = Field(default=None)
+    name: Optional[str] = Field(default=None)
+    temperature: Optional[float] = Field(default=None)
+    temperature_unit: Optional[UnitDefinition] = Field(default=None)
+    x_data: list[float] = Field(default_factory=list)
+    x_data_unit: Optional[UnitDefinition] = Field(default=None)
+    y_data: list[float] = Field(default_factory=list)
+    y_data_unit: Optional[UnitDefinition] = Field(default=None)
+    analysis: Optional[Analysis] = Field(default=None)
+
+    # JSON-LD fields
+    ld_id: str = Field(
+        serialization_alias="@id",
+        default_factory=lambda: "md:MeasuredSpectrum/" + str(uuid4())
+    )
+    ld_type: list[str] = Field(
+        serialization_alias="@type",
+        default_factory = lambda: [
+            "md:MeasuredSpectrum",
+        ],
+    )
+    ld_context: dict[str, str | dict] = Field(
+        serialization_alias="@context",
+        default_factory = lambda: {
+            "md": "http://mdmodel.net/",
+            "id": {
+                "@type": "@id",
+            },
+        }
+    )
+
+
+    def set_attr_term(
+        self,
+        attr: str,
+        term: str | dict,
+        prefix: str | None = None,
+        iri: str | None = None
+    ):
+        """Sets the term for a given attribute in the JSON-LD object
+
+        Example:
+            # Using an IRI term
+            >> obj.set_attr_term("name", "http://schema.org/givenName")
+
+            # Using a prefix and term
+            >> obj.set_attr_term("name", "schema:givenName", "schema", "http://schema.org")
+
+            # Usinng a dictionary term
+            >> obj.set_attr_term("name", {"@id": "http://schema.org/givenName", "@type": "@id"})
+
+        Args:
+            attr (str): The attribute to set the term for
+            term (str | dict): The term to set for the attribute
+
+        Raises:
+            AssertionError: If the attribute is not found in the model
+        """
+
+        assert attr in self.model_fields, f"Attribute {attr} not found in {self.__class__.__name__}"
+
+        if prefix:
+            validate_prefix(term, prefix)
+
+        add_namespace(self, prefix, iri)
+        self.ld_context[attr] = term
+
+    def add_type_term(
+        self,
+        term: str,
+        prefix: str | None = None,
+        iri: str | None = None
+    ):
+        """Adds a term to the @type field of the JSON-LD object
+
+        Example:
+            # Using a term
+            >> obj.add_type_term("https://schema.org/Person")
+
+            # Using a prefixed term
+            >> obj.add_type_term("schema:Person", "schema", "https://schema.org/Person")
+
+        Args:
+            term (str): The term to add to the @type field
+            prefix (str, optional): The prefix to use for the term. Defaults to None.
+            iri (str, optional): The IRI to use for the term prefix. Defaults to None.
+
+        Raises:
+            ValueError: If prefix is provided but iri is not
+            ValueError: If iri is provided but prefix is not
+        """
+
+        if prefix:
+            validate_prefix(term, prefix)
+
+        add_namespace(self, prefix, iri)
+        self.ld_type.append(term)
+
+
+class SimulatedSpectrum(BaseModel):
+
+    model_config: ConfigDict = ConfigDict( # type: ignore
+        validate_assigment = True,
+    ) # type: ignore
+
+    id: str
+    simulation_method: Optional[DFT] = Field(default=None)
+    name: Optional[str] = Field(default=None)
+    temperature: Optional[float] = Field(default=None)
+    temperature_unit: Optional[UnitDefinition] = Field(default=None)
+    x_data: list[float] = Field(default_factory=list)
+    x_data_unit: Optional[UnitDefinition] = Field(default=None)
+    y_data: list[float] = Field(default_factory=list)
+    y_data_unit: Optional[UnitDefinition] = Field(default=None)
+    analysis: Optional[Analysis] = Field(default=None)
+
+    # JSON-LD fields
+    ld_id: str = Field(
+        serialization_alias="@id",
+        default_factory=lambda: "md:SimulatedSpectrum/" + str(uuid4())
+    )
+    ld_type: list[str] = Field(
+        serialization_alias="@type",
+        default_factory = lambda: [
+            "md:SimulatedSpectrum",
         ],
     )
     ld_context: dict[str, str | dict] = Field(
@@ -867,6 +1066,194 @@ class Sample(BaseModel):
         serialization_alias="@type",
         default_factory = lambda: [
             "md:Sample",
+        ],
+    )
+    ld_context: dict[str, str | dict] = Field(
+        serialization_alias="@context",
+        default_factory = lambda: {
+            "md": "http://mdmodel.net/",
+        }
+    )
+
+
+    def set_attr_term(
+        self,
+        attr: str,
+        term: str | dict,
+        prefix: str | None = None,
+        iri: str | None = None
+    ):
+        """Sets the term for a given attribute in the JSON-LD object
+
+        Example:
+            # Using an IRI term
+            >> obj.set_attr_term("name", "http://schema.org/givenName")
+
+            # Using a prefix and term
+            >> obj.set_attr_term("name", "schema:givenName", "schema", "http://schema.org")
+
+            # Usinng a dictionary term
+            >> obj.set_attr_term("name", {"@id": "http://schema.org/givenName", "@type": "@id"})
+
+        Args:
+            attr (str): The attribute to set the term for
+            term (str | dict): The term to set for the attribute
+
+        Raises:
+            AssertionError: If the attribute is not found in the model
+        """
+
+        assert attr in self.model_fields, f"Attribute {attr} not found in {self.__class__.__name__}"
+
+        if prefix:
+            validate_prefix(term, prefix)
+
+        add_namespace(self, prefix, iri)
+        self.ld_context[attr] = term
+
+    def add_type_term(
+        self,
+        term: str,
+        prefix: str | None = None,
+        iri: str | None = None
+    ):
+        """Adds a term to the @type field of the JSON-LD object
+
+        Example:
+            # Using a term
+            >> obj.add_type_term("https://schema.org/Person")
+
+            # Using a prefixed term
+            >> obj.add_type_term("schema:Person", "schema", "https://schema.org/Person")
+
+        Args:
+            term (str): The term to add to the @type field
+            prefix (str, optional): The prefix to use for the term. Defaults to None.
+            iri (str, optional): The IRI to use for the term prefix. Defaults to None.
+
+        Raises:
+            ValueError: If prefix is provided but iri is not
+            ValueError: If iri is provided but prefix is not
+        """
+
+        if prefix:
+            validate_prefix(term, prefix)
+
+        add_namespace(self, prefix, iri)
+        self.ld_type.append(term)
+
+
+class DFT(BaseModel):
+
+    model_config: ConfigDict = ConfigDict( # type: ignore
+        validate_assigment = True,
+    ) # type: ignore
+
+    functional: Optional[str] = Field(default=None)
+
+    # JSON-LD fields
+    ld_id: str = Field(
+        serialization_alias="@id",
+        default_factory=lambda: "md:DFT/" + str(uuid4())
+    )
+    ld_type: list[str] = Field(
+        serialization_alias="@type",
+        default_factory = lambda: [
+            "md:DFT",
+        ],
+    )
+    ld_context: dict[str, str | dict] = Field(
+        serialization_alias="@context",
+        default_factory = lambda: {
+            "md": "http://mdmodel.net/",
+        }
+    )
+
+
+    def set_attr_term(
+        self,
+        attr: str,
+        term: str | dict,
+        prefix: str | None = None,
+        iri: str | None = None
+    ):
+        """Sets the term for a given attribute in the JSON-LD object
+
+        Example:
+            # Using an IRI term
+            >> obj.set_attr_term("name", "http://schema.org/givenName")
+
+            # Using a prefix and term
+            >> obj.set_attr_term("name", "schema:givenName", "schema", "http://schema.org")
+
+            # Usinng a dictionary term
+            >> obj.set_attr_term("name", {"@id": "http://schema.org/givenName", "@type": "@id"})
+
+        Args:
+            attr (str): The attribute to set the term for
+            term (str | dict): The term to set for the attribute
+
+        Raises:
+            AssertionError: If the attribute is not found in the model
+        """
+
+        assert attr in self.model_fields, f"Attribute {attr} not found in {self.__class__.__name__}"
+
+        if prefix:
+            validate_prefix(term, prefix)
+
+        add_namespace(self, prefix, iri)
+        self.ld_context[attr] = term
+
+    def add_type_term(
+        self,
+        term: str,
+        prefix: str | None = None,
+        iri: str | None = None
+    ):
+        """Adds a term to the @type field of the JSON-LD object
+
+        Example:
+            # Using a term
+            >> obj.add_type_term("https://schema.org/Person")
+
+            # Using a prefixed term
+            >> obj.add_type_term("schema:Person", "schema", "https://schema.org/Person")
+
+        Args:
+            term (str): The term to add to the @type field
+            prefix (str, optional): The prefix to use for the term. Defaults to None.
+            iri (str, optional): The IRI to use for the term prefix. Defaults to None.
+
+        Raises:
+            ValueError: If prefix is provided but iri is not
+            ValueError: If iri is provided but prefix is not
+        """
+
+        if prefix:
+            validate_prefix(term, prefix)
+
+        add_namespace(self, prefix, iri)
+        self.ld_type.append(term)
+
+
+class MD(BaseModel):
+
+    model_config: ConfigDict = ConfigDict( # type: ignore
+        validate_assigment = True,
+    ) # type: ignore
+
+    forcefield: Optional[str] = Field(default=None)
+
+    # JSON-LD fields
+    ld_id: str = Field(
+        serialization_alias="@id",
+        default_factory=lambda: "md:MD/" + str(uuid4())
+    )
+    ld_type: list[str] = Field(
+        serialization_alias="@type",
+        default_factory = lambda: [
+            "md:MD",
         ],
     )
     ld_context: dict[str, str | dict] = Field(
