@@ -28,3 +28,15 @@ source = "vcs"
 
 [tool.hatch.build.targets.wheel]
 packages = ["fairvibspec"]
+
+[tool.pytest.ini_options]
+addopts = """
+-q
+--maxfail=1
+--disable-warnings
+--cov=fairvibspec
+--cov-report=term-missing:skip-covered
+--cov-report=xml
+--cov-fail-under=60
+"""
+testpaths = ["tests"]

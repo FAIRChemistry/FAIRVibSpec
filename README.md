@@ -1,5 +1,12 @@
 # FAIRVibSpec
 
+[![CI](https://github.com/FAIRChemistry/FAIRVibSpec/actions/workflows/ci.yml/badge.svg)](https://github.com/FAIRChemistry/FAIRVibSpec/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/FAIRChemistry/FAIRVibSpec/branch/foundation-v2/graph/badge.svg)](https://codecov.io/gh/FAIRChemistry/FAIRVibSpec)
+
+<p align="center">
+  <img src="img/FAIRVibSpec_v1.0.png" alt="FAIRVibSpec" width="220">
+</p>
+
 Toolkit for analysis, visualization and data management of vibrational spectroscopy data.
 
 ## 🛠️ What is FAIRVibSpec?
