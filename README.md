@@ -1,6 +1,6 @@
 # FAIRVibSpec
 
-[![CI](https://github.com/FAIRChemistry/FAIRVibSpec/actions/workflows/ci.yml/badge.svg?branch=foundation-v2)](https://github.com/FAIRChemistry/FAIRVibSpec/actions/workflows/ci.yml)
+[![CI](https://github.com/FAIRChemistry/FAIRVibSpec/actions/workflows/ci.yaml/badge.svg?branch=foundation-v2)](https://github.com/FAIRChemistry/FAIRVibSpec/actions/workflows/ci.yaml)
 [![codecov](https://codecov.io/gh/FAIRChemistry/FAIRVibSpec/branch/foundation-v2/graph/badge.svg)](https://codecov.io/gh/FAIRChemistry/FAIRVibSpec)
 
 <p align="center">
