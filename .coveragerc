@@ -1,0 +1,13 @@
+[run]
+branch = True
+source = fairvibspec
+omit =
+    fairvibspec/_version.py
+    fairvibspec/examples/*
+    **/__init__.py
+
+[report]
+exclude_lines =
+    pragma: no cover
+    if TYPE_CHECKING:
+    if __name__ == .__main__.:
