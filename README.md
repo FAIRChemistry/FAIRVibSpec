@@ -1,57 +1,22 @@
-# IRAnalysis
-Toolkit for the analysis IR spectroscopic data.
+# FAIRVibSpec
+Toolkit for analysis, visualization and data management of vibrational spectroscopy data.
 
-## 🛠️ What is IRAnalysis?
-IRAnalysis presents, as of now, a toolkit to process, analyze, fit and plot data obtained from FT-IR measurements. All data and analysis steps are stored in a data model which can be later exported to ensure reproducability.
+## 🛠️ What is FAIRVibSpec?
+FAIRVibSpec presents, as of now, a toolkit to process, analyze, fit and plot data obtained from selected vibrational spectroscopy methods, including FT-IR, Py-IR, and Raman spectroscopy. All data, relevant metadata, and analysis steps are stored in a data model based on the [md-models](https://github.com/FAIRChemistry/md-models) Rust library. This data model serves as the central hub for the toolkit, governing the flow of data between the different components and allowing for easy export of structured data to ensure reproducability and FAIRness.
 
 ## 📦 Installation
 
-The tool is built on python 3.10. The following packages are required:
-
-- numpy
-- pandas
-- matplotlib
-- scipy
-- astropy
-- jupyter
-- pybaselines
-- sdRDM
-***
-To install packages with pip or anaconda run either
-
-```bash
-python -m pip install numpy pandas matplotlib scipy astropy jupyter pybaselines
-```
-or  
-```bash
-conda install numpy pandas matplotlib scipy astropy jupyter pybaselines
-```
-***
-The datamodel is built with [sdRDM](https://github.com/FAIRChemistry/software-driven-rdm). To install either run
-```bash
-python -m pip install sdRDM
-```
-or build from source
-```bash
-git clone https://github.com/JR-1991/software-driven-rdm.git
-cd software-driven-rdm
-python3 setup.py install
-```
-***
-The tool itself is available from [GitHub](https://github.com/FAIRChemistry/IRAnalysis/) by running:
-```bash
-git clone https://github.com/FAIRChemistry/IRAnalysis/
-```
+_Coming soon..._
 
 ## ⚡️ Quick Start
 
-The current user guide is found in the [user_guide.ipynb](https://github.com/FAIRChemistry/IRAnalysis/blob/main/user_guide.ipynb) jupyter notebook.
+_Coming soon..._
 
 ## ⚖️ License
 
 MIT License
 
-Copyright (c) 2024 FAIR Chemistry
+Copyright (c) 2025 FAIRChemistry
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
