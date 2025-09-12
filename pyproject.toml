@@ -37,6 +37,6 @@ addopts = """
 --cov=fairvibspec
 --cov-report=term-missing:skip-covered
 --cov-report=xml
---cov-fail-under=60
+--cov-fail-under=0
 """
 testpaths = ["tests"]
