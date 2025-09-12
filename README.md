@@ -1,7 +1,9 @@
 # FAIRVibSpec
+
 Toolkit for analysis, visualization and data management of vibrational spectroscopy data.
 
 ## 🛠️ What is FAIRVibSpec?
+
 FAIRVibSpec presents, as of now, a toolkit to process, analyze, fit and plot data obtained from selected vibrational spectroscopy methods, including FT-IR, Py-IR, and Raman spectroscopy. All data, relevant metadata, and analysis steps are stored in a data model based on the [md-models](https://github.com/FAIRChemistry/md-models) Rust library. This data model serves as the central hub for the toolkit, governing the flow of data between the different components and allowing for easy export of structured data to ensure reproducability and FAIRness.
 
 ## 📦 Installation
