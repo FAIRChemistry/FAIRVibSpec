@@ -2,8 +2,8 @@
 branch = True
 source = fairvibspec
 omit =
+    fairvibspec/core/fairvibspec.py
     fairvibspec/_version.py
-    fairvibspec/examples/*
     **/__init__.py
 
 [report]
